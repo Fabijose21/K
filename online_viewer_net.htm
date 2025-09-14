@@ -1,0 +1,338 @@
+<!doctype html>
+<html lang="es">
+<head>
+<meta charset="utf-8" />
+<meta name="viewport" content="width=device-width,initial-scale=1" />
+<title>Corazón Explota — Karen</title>
+<style>
+  :root{
+    --bg:#111827;
+    --heart-red:#ff416c;
+    --heart-pink:#ff8fb1;
+    --text:#fff;
+  }
+
+  html,body{height:100%;margin:0;}
+  body{
+    background: radial-gradient( circle at 50% 30%, #2b2b3a 0%, var(--bg) 40%);
+    display:flex;
+    justify-content:center;
+    align-items:center;
+    font-family: "Poppins", system-ui, -apple-system, "Segoe UI", Roboto, "Helvetica Neue", Arial;
+    overflow:hidden;
+  }
+
+  .stage{
+    width: 90vmin;
+    height: 90vmin;
+    max-width:900px;
+    max-height:900px;
+    position:relative;
+    display:flex;
+    align-items:center;
+    justify-content:center;
+    user-select:none;
+    cursor:pointer;
+  }
+
+  /* --- Corazón SVG principal --- */
+  .main-heart{
+    width:45vmin;
+    height:45vmin;
+    transition: transform 350ms cubic-bezier(.2,.9,.3,1), opacity 250ms;
+    transform-origin:center;
+    z-index:5;
+    filter: drop-shadow(0 10px 30px rgba(0,0,0,.6));
+  }
+
+  /* pulsito antes de click */
+  .main-heart.idle{
+    animation: beat 1.2s infinite;
+  }
+  @keyframes beat{
+    0%{ transform: scale(.99) }
+    40%{ transform: scale(1.06) }
+    100%{ transform: scale(.99) }
+  }
+
+  /* cuando explota: expandir + desaparecer */
+  .main-heart.explode{
+    animation: explode-scale 600ms forwards;
+  }
+  @keyframes explode-scale{
+    0%{ transform: scale(1); opacity:1; filter: drop-shadow(0 10px 30px rgba(0,0,0,.6)); }
+    40%{ transform: scale(1.25) rotate(-6deg); opacity:1; }
+    100%{ transform: scale(2.6) rotate(10deg); opacity:0; filter: blur(2px); }
+  }
+
+  /* Nombre (invisible hasta después de la explosión) */
+  .name{
+    position:absolute;
+    z-index:8;
+    pointer-events:none;
+    color:var(--text);
+    font-weight:800;
+    font-size:6.2vmin;
+    letter-spacing:.08em;
+    text-align:center;
+    opacity:0;
+    transform: scale(.9);
+    transition: opacity 420ms cubic-bezier(.2,.9,.3,1), transform 420ms;
+    text-shadow: 0 6px 26px rgba(0,0,0,.6);
+    mix-blend-mode: screen;
+  }
+
+  .name.show{
+    opacity:1;
+    transform: scale(1);
+  }
+
+  /* adornos de texto: trazo rosa alrededor */
+  .name .outline{
+    position:absolute;
+    inset:0;
+    -webkit-text-stroke: .6vmin rgba(255,89,130,.15);
+    z-index:-1;
+  }
+
+  /* contenedor que recibirá corazones pequeños */
+  .particles{
+    position:absolute;
+    inset:0;
+    z-index:6;
+    pointer-events:none;
+    overflow:visible;
+  }
+
+  /* mini-corazón estilo SVG (tamaño controlado por inline width) */
+  .mini{
+    position:absolute;
+    will-change: transform, opacity;
+    transform-origin:center;
+    opacity:1;
+    animation: float-up linear forwards;
+  }
+
+  /* movimiento por JS: la keyframe define desplazamiento y fade */
+  @keyframes float-up{
+    0%{ transform: translateY(0) scale(0.9) rotate(0deg); opacity:1; }
+    30%{ transform: translateY(-6vh) scale(1.05) rotate(12deg); opacity:1; }
+    100%{ transform: translateY(-120vh) scale(.6) rotate(120deg); opacity:0; }
+  }
+
+  /* pequeño "burst" de partículas tras explosion que se dispersan radialmente */
+  .burst{
+    animation: burst ease-out forwards;
+  }
+  @keyframes burst{
+    0%{ transform: scale(.25); opacity:1; }
+    80%{ transform: scale(1.2); opacity:1; }
+    100%{ transform: scale(0.9); opacity:0; }
+  }
+
+  /* texto pequeño debajo */
+  .subtitle{
+    position:absolute;
+    bottom:6%;
+    width:100%;
+    text-align:center;
+    color:rgba(255,255,255,.45);
+    font-size:1.6vmin;
+    z-index:9;
+    pointer-events:none;
+  }
+
+  /* adaptaciones móviles */
+  @media (max-width:600px){
+    .name{ font-size:8.5vmin; }
+  }
+</style>
+</head>
+<body>
+  <div class="stage" id="stage" title="Haz click para explotar el corazón">
+    <!-- main SVG heart (adaptado y simple) -->
+    <svg class="main-heart idle" id="mainHeart" viewBox="0 0 100 100" xmlns="http://www.w3.org/2000/svg" role="img" aria-label="Corazón">
+      <!-- corazón -->
+      <defs>
+        <linearGradient id="g1" x1="0" x2="1">
+          <stop offset="0" stop-color="#ff6a8a"/>
+          <stop offset="1" stop-color="#ff2f6b"/>
+        </linearGradient>
+        <filter id="glow">
+          <feGaussianBlur stdDeviation="6" result="b"/>
+          <feMerge>
+            <feMergeNode in="b"/>
+            <feMergeNode in="SourceGraphic"/>
+          </feMerge>
+        </filter>
+      </defs>
+
+      <g transform="translate(0,0)">
+        <path id="heartPath" d="M50 88 L14 56 C6 48 6 36 18 28 C28 22 38 28 50 40 C62 28 72 22 82 28 C94 36 94 48 86 56 L50 88 Z"
+          fill="url(#g1)" stroke="#fff4" stroke-width="0.6" filter="url(#glow)"/>
+        <!-- un contorno interior blanco para que brille el nombre cuando aparezca -->
+        <path d="M50 82 L20 54 C14 48 14 38 22 32 C32 26 40 30 50 40 C60 30 68 26 78 32 C86 38 86 48 80 54 L50 82 Z"
+          fill="none" stroke="#fff3" stroke-width="0.6" opacity="0.08"/>
+      </g>
+    </svg>
+
+    <!-- Nombre que aparece después -->
+    <div class="name" id="nameText" aria-hidden="true">
+      Karen
+      <div class="outline" aria-hidden="true"></div>
+    </div>
+
+    <!-- contenedor de corazones pequeños -->
+    <div class="particles" id="particles"></div>
+
+    <div class="subtitle">Haz click en el corazón</div>
+  </div>
+
+<script>
+  // ---- Configuraciones fáciles de cambiar ----
+  const NAME = "Karen";         // <-- cambia aquí el nombre
+  const PARTICLE_COUNT = 42;    // cuántos corazones pequeños generar
+  const BURST_COUNT = 10;       // cuantos mini-burst rápidos al inicio
+  // -------------------------------------------
+
+  const mainHeart = document.getElementById('mainHeart');
+  const nameDiv = document.getElementById('nameText');
+  const particles = document.getElementById('particles');
+  const stage = document.getElementById('stage');
+
+  // poner nombre desde la constante
+  nameDiv.firstChild.nodeValue = NAME;
+
+  // genera SVG mini-corazón (string) — se usa para cada partícula
+  function miniHeartSVG(size = 24){
+    return `
+      <svg class="mini" width="${size}" height="${size}" viewBox="0 0 100 100" xmlns="http://www.w3.org/2000/svg">
+        <path d="M50 88 L14 56 C6 48 6 36 18 28 C28 22 38 28 50 40 C62 28 72 22 82 28 C94 36 94 48 86 56 L50 88 Z"
+          fill="url(#mgrad)" stroke="rgba(255,255,255,0.06)" stroke-width="0.6"/>
+        <defs>
+          <linearGradient id="mgrad" x1="0" x2="1">
+            <stop offset="0" stop-color="${randomBetweenColor('#ff4a60','#ff8fb1')}"/>
+            <stop offset="1" stop-color="${randomBetweenColor('#ff2f6b','#ff9fb0')}"/>
+          </linearGradient>
+        </defs>
+      </svg>
+    `;
+  }
+
+  // retorna un color intermedio (simple mezcla vía número hex approximation)
+  function randomBetweenColor(a,b){
+    // simple: devuelve aleatorio entre a y b escogiendo uno u otro
+    return Math.random() < .5 ? a : b;
+  }
+
+  // función para crear una partícula en una posición (x,y) en stage (0..1 relativos)
+  function spawnParticle(relX, relY, options = {}){
+    const el = document.createElement('div');
+    el.innerHTML = miniHeartSVG(options.size || (8 + Math.random()*18));
+    const svgEl = el.firstElementChild;
+    svgEl.style.left = '0';
+    svgEl.style.top = '0';
+    svgEl.style.position = 'absolute';
+    svgEl.style.pointerEvents = 'none';
+    svgEl.style.transform = `translate(-50%,-50%) rotate(${Math.random()*360}deg) scale(${0.7 + Math.random()*.9})`;
+    svgEl.style.opacity = 1;
+
+    // colocar en coords relativas dentro del stage
+    const stageRect = stage.getBoundingClientRect();
+    const x = (relX * stageRect.width);
+    const y = (relY * stageRect.height);
+    svgEl.style.left = x + 'px';
+    svgEl.style.top = y + 'px';
+
+    // duración aleatoria
+    const dur = (4 + Math.random()*6).toFixed(2) + 's';
+    svgEl.style.animationDuration = dur;
+    svgEl.style.animationTimingFunction = 'cubic-bezier(.15,.9,.3,1)';
+
+    // slight horizontal drift via CSS transform animation override
+    const drift = (Math.random()*80 - 40).toFixed(1); // px
+    svgEl.style.setProperty('--drift', drift + 'px');
+
+    // add a tiny random delay
+    svgEl.style.animationDelay = (Math.random() * 0.35) + 's';
+
+    // append and remove after animation ends
+    particles.appendChild(svgEl);
+    setTimeout(()=>{ svgEl.remove(); }, (parseFloat(dur) + 0.6) * 1000);
+  }
+
+  // burst radial initial (corazones que salen en todas direcciones desde centro del corazón)
+  function radialBurst(centerX, centerY, amount){
+    for(let i=0;i<amount;i++){
+      // spawn slightly offset around center to create spread
+      const rx = centerX + (Math.random()*0.06 - 0.03);
+      const ry = centerY + (Math.random()*0.06 - 0.03);
+      spawnParticle(rx, ry, { size: 12 + Math.random()*18 });
+    }
+  }
+
+  // generar muchos corazones que emergen alrededor del nombre (distribuidos)
+  function floodHearts(amount){
+    for(let i=0;i<amount;i++){
+      // coordenadas uniformes pero algunas en los bordes
+      const rx = 0.18 + Math.random()*0.64; // evita bordes extremos
+      const ry = 0.25 + Math.random()*0.6;
+      setTimeout(()=> spawnParticle(rx, ry, { size: 8 + Math.random()*20 }), Math.random()*1600);
+    }
+  }
+
+  // evita clicks repetidos rápidos
+  let exploded = false;
+
+  // detecta clicks sobre el SVG o la stage
+  function doExplode(e){
+    if (exploded) return;
+    exploded = true;
+    // animar corazón principal
+    mainHeart.classList.remove('idle');
+    mainHeart.classList.add('explode');
+
+    // posición relativa donde se hizo click (si quieres explosion en click real)
+    const rect = stage.getBoundingClientRect();
+    const relX = Math.max(0, Math.min(1, ( (e.clientX || rect.left + rect.width/2) - rect.left ) / rect.width ));
+    const relY = Math.max(0, Math.min(1, ( (e.clientY || rect.top + rect.height/2) - rect.top ) / rect.height ));
+
+    // burst inmediato
+    radialBurst(relX, relY, BURST_COUNT);
+
+    // revelar nombre con pequeña demora para clave visual
+    setTimeout(()=>{
+      nameDiv.classList.add('show');
+
+      // generar "lluvia" de corazones alrededor del texto
+      floodHearts(PARTICLE_COUNT);
+    }, 320);
+
+    // si quieres permitir repetirlo después de X segundos, quita el comment:
+    // setTimeout(()=> exploded = false, 3000);
+  }
+
+  // escucha clicks en el contenedor
+  stage.addEventListener('click', doExplode);
+
+  // también permitir 'Enter' para accesibilidad (cuando stage esté enfocado)
+  stage.addEventListener('keydown', (ev)=>{
+    if(ev.key === 'Enter' || ev.key === ' ') doExplode(ev);
+  });
+
+  // permitir enfoque para teclado
+  stage.setAttribute('tabindex','0');
+
+  // small enhancement: clicking on heart creates a nicer dispersion from center of main heart
+  mainHeart.addEventListener('click', (ev)=>{
+    // stop propagation to avoid double-calls (stage click handler will also run, but it's idempotent)
+    ev.stopPropagation();
+    doExplode(ev);
+  });
+
+  // Optional: preload a bit of particles so the first explosion feels immediate
+  // nothing else needed
+
+</script>
+</body>
+</html>
