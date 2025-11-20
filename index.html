@@ -2,160 +2,1247 @@
 <html lang="es">
 <head>
   <meta charset="UTF-8" />
-  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
-  <title>Horario Escolar</title>
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Mi Perfil - Facebook 2025</title>
   <style>
-    body { font-family: 'Inter', sans-serif; background: #f8fafc; padding: 20px; }
-    table {
+    :root {
+      --fb-blue: #1877f2;
+      --fb-dark: #1c1e21;
+      --fb-gray: #f0f2f5;
+      --text: #1c1e21;
+      --light-text: #65676b;
+    }
+    * { margin:0; padding:0; box-sizing:border-box; font-family: 'Segoe UI', Arial, sans-serif; }
+    body { background: #e4e6eb; color: var(--text); line-height: 1.34; }
+
+    .container { max-width: 980px; margin: 0 auto; padding: 20px 10px; }
+
+    /* Header */
+    .header {
+      background: white;
+      padding: 12px 20px;
+      box-shadow: 0 2px 4px rgba(0,0,0,.1);
+      position: sticky;
+      top: 0;
+      z-index: 100;
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+    }
+    .logo { font-size: 28px; font-weight: 900; color: var(--fb-blue); }
+    .header-right button, .header-right label {
+      background: var(--fb-blue);
+      color: white;
+      border: none;
+      padding: 8px 16px;
+      border-radius: 20px;
+      cursor: pointer;
+      margin-left: 8px;
+      font-weight: 600;
+    }
+    .header-right .reset-btn {
+      background: #e74c3c;
+    }
+
+    /* Modo Editor */
+    .edit-mode-only { display: none; }
+    body.editor-active .edit-mode-only { display: block !important; }
+    body.editor-active .view-mode-only { display: none !important; }
+
+    /* Cover + Profile */
+    .cover-container { position: relative; margin-top: 20px; background: white; border-radius: 8px; overflow: hidden; }
+    #cover-photo {
       width: 100%;
-      max-width: 900px;
-      margin: 20px auto;
-      border-collapse: separate;
-      border-spacing: 0;
-      background-color: #fefefe;
-      box-shadow: 0 4px 12px rgba(0, 0, 0, 0.08);
-      border-radius: 12px;
+      height: 350px;
+      object-fit: cover;
+      background: #ccc;
+      cursor: pointer;
+      display: block;
+    }
+    .profile-section {
+      display: flex;
+      align-items: flex-end;
+      padding: 0 20px;
+      position: relative;
+      background: white;
+      padding-bottom: 16px;
+    }
+    #profile-pic {
+      width: 168px;
+      height: 168px;
+      border-radius: 50%;
+      border: 5px solid white;
+      object-fit: cover;
+      background: #fff;
+      cursor: pointer;
+      margin-top: -84px;
+    }
+    .profile-info {
+      margin-left: 20px;
+      flex: 1;
+    }
+    #profile-name {
+      font-size: 32px;
+      font-weight: 700;
+      display: flex;
+      align-items: center;
+      gap: 8px;
+      margin-bottom: 4px;
+    }
+    .badge {
+      width: 20px;
+      height: 20px;
+      border-radius: 50%;
+    }
+    .comment-badge {
+      width: 14px;
+      height: 14px;
+      border-radius: 50%;
+      margin-left: 4px;
+      vertical-align: middle;
+    }
+    #followers-count {
+      font-size: 15px;
+      color: #65676b;
+      display: inline-block;
+      padding: 4px 8px;
+      border-radius: 4px;
+      cursor: text;
+    }
+    #followers-count:hover {
+      background: #f0f2f5;
+    }
+    .invisible-lift-btn {
+      opacity: 0;
+      pointer-events: none;
+      width: 0;
+      height: 0;
+      padding: 0;
+      margin: 0;
+      border: none;
+      background: none;
+    }
+
+    .card {
+      background: white;
+      border-radius: 8px;
+      padding: 16px;
+      box-shadow: 0 1px 2px rgba(0,0,0,.1);
+      margin-bottom: 20px;
+    }
+
+    /* Reacciones */
+    .reactions-bar {
+      padding: 8px 16px;
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      font-size: 13px;
+      color: #65676b;
+      border-top: 1px solid #e4e6eb;
+    }
+    .reaction-summary {
+      display: flex;
+      align-items: center;
+      gap: 6px;
+    }
+    .reaction-icons {
+      display: flex;
+      align-items: center;
+      gap: 2px;
+      font-size: 16px;
+    }
+    .reaction-count {
+      margin-left: 6px;
+      color: #65676b;
+      cursor: pointer;
+    }
+    .comments-shares {
+      color: #65676b;
+      cursor: pointer;
+    }
+
+    .post {
+      background: white;
+      border-radius: 8px;
+      margin-bottom: 20px;
+      box-shadow: 0 1px 2px rgba(0,0,0,.1);
       overflow: hidden;
     }
-    th, td {
+    .post-header {
       padding: 12px 16px;
-      text-align: center;
-      border-bottom: 1px solid #e2e8f0;
-      border-right: 1px solid #e2e8f0;
-      transition: background-color 0.3s ease;
+      display: flex;
+      align-items: center;
+      position: relative;
     }
-    th:last-child, td:last-child { border-right: none; }
-    tr:last-child td { border-bottom: none; }
-    th {
-      background: linear-gradient(135deg, #60a5fa, #93c5fd);
-      color: #1e3a8a;
+    .post-header img {
+      width: 40px;
+      height: 40px;
+      border-radius: 50%;
+      margin-right: 12px;
+    }
+    .post-author {
       font-weight: 600;
-      text-transform: uppercase;
+      display: flex;
+      align-items: center;
+      gap: 6px;
+    }
+    .post-time { font-size: 13px; color: #65676b; }
+
+    .post-content { padding: 0 16px 12px; white-space: pre-wrap; }
+    .post-content a { color: var(--fb-blue); font-weight: 600; }
+    .post-image { width: 100%; max-height: 600px; object-fit: cover; cursor: pointer; }
+
+    /* Fotos Grid */
+    .photos-grid {
+      display: grid;
+      grid-template-columns: repeat(3, 1fr);
+      gap: 8px;
+      margin-top: 10px;
+    }
+    .photo-item {
+      position: relative;
+      width: 100%;
+      padding-bottom: 100%;
+      overflow: hidden;
+      border-radius: 8px;
+      background: #f0f2f5;
+    }
+    .photo-item img {
+      position: absolute;
+      top: 0;
+      left: 0;
+      width: 100%;
+      height: 100%;
+      object-fit: cover;
+      cursor: pointer;
+    }
+    .photo-item button {
+      position: absolute;
+      right: 4px;
+      top: 4px;
+      background: rgba(0,0,0,0.6);
+      color: white;
+      border: none;
+      border-radius: 50%;
+      width: 24px;
+      height: 24px;
+      cursor: pointer;
+      z-index: 10;
+      font-size: 18px;
+      line-height: 24px;
+    }
+
+    .friends-grid {
+      display: grid;
+      grid-template-columns: repeat(3, 1fr);
+      gap: 8px;
+      margin-top: 10px;
+    }
+    .friend-item {
+      position: relative;
+    }
+    .friend-item img {
+      width: 100%;
+      height: 110px;
+      object-fit: cover;
+      border-radius: 8px;
+    }
+    .friend-name {
+      margin-top: 4px;
+      font-weight: 600;
+      font-size: 13px;
+      display: flex;
+      align-items: center;
+      gap: 4px;
+    }
+    .friend-badge {
+      width: 13px;
+      height: 13px;
+      border-radius: 50%;
+      flex-shrink: 0;
+    }
+    .friend-item button {
+      position: absolute;
+      right: 4px;
+      top: 4px;
+      background: rgba(0,0,0,0.6);
+      color: white;
+      border: none;
+      border-radius: 50%;
+      width: 24px;
+      height: 24px;
+      cursor: pointer;
+      z-index: 10;
+      font-size: 18px;
+      line-height: 24px;
+    }
+
+    /* Modal */
+    .modal {
+      position: fixed; top: 0; left: 0; width: 100%; height: 100%;
+      background: rgba(0,0,0,0.6); display: flex; align-items: center; justify-content: center; z-index: 1000;
+    }
+    .modal-content {
+      background: white; padding: 24px; border-radius: 12px; width: 500px; max-width: 90%;
+      max-height: 80vh;
+      overflow-y: auto;
+    }
+    .modal-content h3 {
+      margin-bottom: 16px;
+    }
+    .modal-content p {
+      margin-bottom: 12px;
+    }
+    .modal-content input[type="text"], .modal-content input[type="url"] {
+      width: 100%;
+      padding: 8px;
+      border: 1px solid #ddd;
+      border-radius: 6px;
       font-size: 14px;
-      letter-spacing: 0.05em;
     }
-    td { font-size: 14px; color: #1e293b; }
-    .recreo-row {
-      background: linear-gradient(135deg, #a7f3d0, #6ee7b7);
+    .modal-content button {
+      padding: 8px 16px;
+      border: none;
+      border-radius: 6px;
+      cursor: pointer;
       font-weight: 600;
-      text-transform: uppercase;
-      color: #064e3b;
+      margin-left: 8px;
     }
-    .highlight-header {
-      background: linear-gradient(135deg, #3b82f6, #60a5fa) !important;
-      color: #ffffff !important;
+
+    /* Comentarios opcionales */
+    .comments-section {
+      border-top: 1px solid #e4e6eb;
+      padding: 12px 16px;
+      display: none;
     }
-    .highlight-cell, .highlight-time {
-      background-color: #bae6fd !important;
-      color: #1e40af;
+    .comments-section.visible {
+      display: block;
+    }
+    .comment-item {
+      display: flex;
+      gap: 8px;
+      margin-bottom: 12px;
+    }
+    .comment-item img {
+      width: 32px;
+      height: 32px;
+      border-radius: 50%;
+    }
+    .comment-bubble {
+      background: #f0f2f5;
+      padding: 8px 12px;
+      border-radius: 18px;
+      flex: 1;
+    }
+    .comment-author {
       font-weight: 600;
+      font-size: 13px;
+      margin-bottom: 2px;
+      display: flex;
+      align-items: center;
+      gap: 4px;
     }
-    tr:hover td { background-color: #f1f5f9; }
-    .time-slot {
-      font-weight: 500;
-      color: #1e293b;
-      background-color: #f8fafc;
+    .comment-text {
+      font-size: 13px;
     }
-    @media (max-width: 600px) {
-      table { width: 95%; font-size: 12px; }
-      th, td { padding: 8px 10px; }
+
+    .character-item {
+      display: flex;
+      align-items: center;
+      gap: 12px;
+      padding: 12px;
+      background: #f0f2f5;
+      border-radius: 8px;
+      margin-bottom: 8px;
+      cursor: pointer;
+    }
+    .character-item:hover {
+      background: #e4e6eb;
+    }
+    .character-item img {
+      width: 40px;
+      height: 40px;
+      border-radius: 50%;
+    }
+    .character-item.profile-character {
+      border: 2px solid var(--fb-blue);
+      cursor: default;
+    }
+    .character-item.profile-character:hover {
+      background: #f0f2f5;
+    }
+
+    @media print {
+      .header, .edit-mode-only, .no-print { display: none !important; }
+      body { background: white; }
+      .container { padding: 0; max-width: 100%; }
+    }
+    @media (max-width: 900px) {
+      .main-grid { grid-template-columns: 1fr !important; }
+      .profile-section { flex-direction: column; align-items: center; text-align: center; }
+      #profile-pic { width: 120px; height: 120px; margin-top: -60px; }
+      .profile-info { margin-left: 0; margin-top: 12px; }
     }
   </style>
 </head>
 <body>
 
-<table>
-  <thead>
-    <tr>
-      <th>Hrs.</th>
-      <th class="lunes-col">Lunes</th>
-      <th class="martes-col">Martes</th>
-      <th class="miercoles-col">Miércoles</th>
-      <th class="jueves-col">Jueves</th>
-      <th class="viernes-col">Viernes</th>
-    </tr>
-  </thead>
-  <tbody>
-    <tr>
-      <td class="time-slot">8.00 - 9.30</td>
-      <td class="lunes-col">MAT</td>
-      <td class="martes-col">MAT</td>
-      <td class="miercoles-col">COM</td>
-      <td class="jueves-col">COM</td>
-      <td class="viernes-col">CYT</td>
-    </tr>
-    <tr>
-      <td class="time-slot">9.30 - 11.00</td>
-      <td class="lunes-col">DPCC</td>
-      <td class="martes-col">EPT</td>
-      <td class="miercoles-col">DPCC</td>
-      <td class="jueves-col">MAT</td>
-      <td class="viernes-col">ARTE</td>
-    </tr>
-    <tr>
-      <td class="time-slot">11.00 - 11.15</td>
-      <td colspan="5" class="recreo-row">1er RECREO</td>
-    </tr>
-    <tr>
-      <td class="time-slot">11.15 - 12.45</td>
-      <td class="lunes-col">TUTORIA</td>
-      <td class="martes-col">E. FISICA</td>
-      <td class="miercoles-col">CYT</td>
-      <td class="jueves-col">REL</td>
-      <td class="viernes-col">CC SS</td>
-    </tr>
-    <tr>
-      <td class="time-slot">12.45 - 13.30</td>
-      <td class="lunes-col">E. FISICA</td>
-      <td class="martes-col">CYT</td>
-      <td class="miercoles-col">INGLES</td>
-      <td class="jueves-col">CYT</td>
-      <td class="viernes-col">EPT</td>
-    </tr>
-    <tr>
-      <td class="time-slot">13.30 - 14.00</td>
-      <td colspan="5" class="recreo-row">2do RECREO</td>
-    </tr>
-    <tr>
-      <td class="time-slot">14.00 - 15.30</td>
-      <td class="lunes-col">INGLES</td>
-      <td class="martes-col">ARTE</td>
-      <td class="miercoles-col">CCSS</td>
-      <td class="jueves-col">INGLES</td>
-      <td class="viernes-col">COM</td>
-    </tr>
-  </tbody>
-</table>
+<div class="header">
+  <div class="logo">facebook</div>
+  <div class="header-right">
+    <button class="view-mode-only" onclick="window.print()">Imprimir Perfil</button>
+    <button class="view-mode-only" onclick="toggleEditMode()">Editar Perfil</button>
+    <button class="edit-mode-only" onclick="toggleEditMode()">Salir del Editor</button>
+    <button class="edit-mode-only reset-btn" onclick="resetProfile()">Resetear Perfil</button>
+    <button class="edit-mode-only" onclick="exportProfile()">Exportar</button>
+    <label class="edit-mode-only" style="cursor:pointer;">
+      Importar <input type="file" id="import-file" style="display:none" accept=".json" onchange="importProfile(event)">
+    </label>
+  </div>
+</div>
+
+<div class="container">
+  <div class="cover-container">
+    <img id="cover-photo" src="" alt="Cover" style="background:#ccc;" />
+    <div class="profile-section">
+      <img id="profile-pic" src="" alt="Perfil" style="background:#e4e6eb;" />
+      <div class="profile-info">
+        <h1 id="profile-name" contenteditable="false">
+          <button class="invisible-lift-btn">.</button>
+        </h1>
+        <div id="followers-count" contenteditable="false"></div>
+        <div class="edit-mode-only" style="margin-top:8px;">
+          <button onclick="chooseBadge('main')">Cambiar Insignia</button>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <div class="main-grid" style="display:grid;grid-template-columns:360px 1fr;gap:20px;margin-top:20px;">
+    <!-- Izquierda -->
+    <div>
+      <div class="card">
+        <h3>Información</h3>
+        <div id="info-display" class="view-mode-only" style="white-space: pre-line; line-height:1.6; margin-top:8px;"></div>
+        <textarea id="info-text" class="edit-mode-only" placeholder="Añade información sobre ti..." style="width:100%; min-height:120px; border:1px solid #ddd; border-radius:8px; padding:12px; margin-top:8px; font-size:14px;"></textarea>
+      </div>
+
+      <div class="card">
+        <div style="display:flex;justify-content:space-between;align-items:center;">
+          <h3>Fotos</h3>
+          <button class="edit-mode-only" onclick="openAddPhotoModal()">+ Añadir foto</button>
+        </div>
+        <div class="photos-grid" id="photos-container"></div>
+      </div>
+
+      <div class="card">
+        <div style="display:flex;justify-content:space-between;align-items:center;">
+          <h3>Amigos</h3>
+          <button class="edit-mode-only" onclick="openAddFriendModal()">+ Añadir amigo</button>
+        </div>
+        <div class="friends-grid" id="friends-container"></div>
+      </div>
+    </div>
+
+    <!-- Derecha -->
+    <div>
+      <div class="create-post edit-mode-only card">
+        <textarea id="new-post-text" placeholder="¿En qué estás pensando?" rows="4" style="width:100%; border:1px solid #ddd; border-radius:8px; padding:12px; font-size:14px;"></textarea>
+        <div style="margin-top:10px;display:flex;gap:10px;">
+          <button onclick="addPostImage()">Añadir foto</button>
+          <button onclick="createNewPost()">Publicar</button>
+        </div>
+      </div>
+
+      <div id="posts-container"></div>
+    </div>
+  </div>
+</div>
+
+<!-- Modal Añadir Foto -->
+<div class="modal" id="add-photo-modal" style="display:none;">
+  <div class="modal-content">
+    <h3>Añadir Foto</h3>
+    <p>
+      <button onclick="document.getElementById('photo-input').click()">Seleccionar foto</button>
+      <input type="file" id="photo-input" style="display:none;" accept="image/*">
+      <span id="photo-name">Sin foto seleccionada</span>
+    </p>
+    <div style="margin-top:20px; text-align:right;">
+      <button onclick="closeAddPhotoModal()">Cancelar</button>
+      <button style="background:var(--fb-blue);color:white;" onclick="savePhoto()">Añadir</button>
+    </div>
+  </div>
+</div>
+
+<!-- Modal Añadir Amigo -->
+<div class="modal" id="add-friend-modal" style="display:none;">
+  <div class="modal-content">
+    <h3>Añadir Amigo</h3>
+    <p>Nombre: <input type="text" id="friend-name"></p>
+    <p>Foto: <button onclick="document.getElementById('friend-pic-input').click()">Seleccionar foto</button>
+      <input type="file" id="friend-pic-input" style="display:none;" accept="image/*">
+      <span id="friend-pic-name">Sin foto</span>
+    </p>
+    <p>Insignia: <button onclick="chooseBadge('friend')">Elegir insignia</button> <span id="friend-badge-preview"></span></p>
+    <div style="margin-top:20px; text-align:right;">
+      <button onclick="closeAddFriendModal()">Cancelar</button>
+      <button style="background:var(--fb-blue);color:white;" onclick="saveFriend()">Añadir</button>
+    </div>
+  </div>
+</div>
+
+<!-- Modal Editar Reacciones -->
+<div class="modal" id="reactions-modal" style="display:none;">
+  <div class="modal-content">
+    <h3>Editar Reacciones</h3>
+    <p>Total de reacciones: <input type="text" id="reaction-total" style="width:100%; padding:8px;"></p>
+    <p>Comentarios: <input type="text" id="reaction-comments" style="width:100%; padding:8px;"></p>
+    <p>Compartidos: <input type="text" id="reaction-shares" style="width:100%; padding:8px;"></p>
+    <div style="margin-top:20px; text-align:right;">
+      <button onclick="closeReactionsModal()">Cancelar</button>
+      <button style="background:var(--fb-blue);color:white;" onclick="saveReactions()">Guardar</button>
+    </div>
+  </div>
+</div>
+
+<!-- Modal Comentarios -->
+<div class="modal" id="comments-modal" style="display:none;">
+  <div class="modal-content">
+    <h3>Gestionar Comentarios</h3>
+    
+    <!-- Tabs -->
+    <div style="display:flex; gap:8px; border-bottom:2px solid #e4e6eb; margin-bottom:16px;">
+      <button id="tab-comments" onclick="switchTab('comments')" style="padding:8px 16px; border:none; background:none; border-bottom:3px solid var(--fb-blue); font-weight:600; cursor:pointer;">Comentarios</button>
+      <button id="tab-characters" onclick="switchTab('characters')" style="padding:8px 16px; border:none; background:none; border-bottom:3px solid transparent; cursor:pointer;">Personajes</button>
+    </div>
+
+    <!-- Tab Comentarios -->
+    <div id="comments-tab-content">
+      <div id="comments-list"></div>
+      <div style="margin-top:16px; border-top:1px solid #ddd; padding-top:16px;">
+        <p><strong>Añadir comentario</strong></p>
+        <p>
+          <button onclick="openCharacterSelector()">Seleccionar personaje</button>
+          <span id="selected-character-name" style="margin-left:8px; color:#65676b;"></span>
+        </p>
+        <p>Comentario: <input type="text" id="new-comment-text"></p>
+        <button onclick="addCommentToPost()" style="background:var(--fb-blue); color:white;">Añadir</button>
+      </div>
+    </div>
+
+    <!-- Tab Personajes -->
+    <div id="characters-tab-content" style="display:none;">
+      <div id="characters-list"></div>
+      <div style="margin-top:16px; border-top:1px solid #ddd; padding-top:16px;">
+        <p><strong>Crear nuevo personaje</strong></p>
+        <p>Nombre: <input type="text" id="new-char-name"></p>
+        <p>Foto (URL): <input type="url" id="new-char-pic" placeholder="https://..."></p>
+        <p>Insignia: <button onclick="chooseBadge('character')">Elegir insignia</button> <span id="char-badge-preview"></span></p>
+        <button onclick="saveCharacter()" style="background:var(--fb-blue); color:white;">Guardar personaje</button>
+      </div>
+    </div>
+
+    <div style="margin-top:20px; text-align:right; border-top:1px solid #ddd; padding-top:16px;">
+      <button onclick="closeCommentsModal()">Cerrar</button>
+    </div>
+  </div>
+</div>
+
+<!-- Modal Selector de Personajes -->
+<div class="modal" id="character-selector-modal" style="display:none;">
+  <div class="modal-content">
+    <h3>Seleccionar Personaje</h3>
+    <div id="character-selector-list"></div>
+    <div style="margin-top:20px; text-align:right;">
+      <button onclick="closeCharacterSelector()">Cancelar</button>
+    </div>
+  </div>
+</div>
 
 <script>
-  // === TU SCRIPT ORIGINAL (del gist) ===
-  const today = new Date().getDay();
-  const days = ['domingo', 'lunes', 'martes', 'miercoles', 'jueves', 'viernes', 'sabado'];
-  const todayName = days[today];
+  let isEditor = false;
+  let tempPostImage = null;
+  let tempFriendPic = null;
+  let tempFriendBadge = "";
+  let tempPhoto = null;
+  let currentPostForReactions = -1;
+  let currentPostForComments = -1;
+  let selectedCharacter = null;
+  let tempCharBadge = "";
+  let currentTab = 'comments';
 
-  function timeToMinutes(timeStr) {
-    const [hours, minutes] = timeStr.split('.').map(Number);
-    return hours * 60 + minutes;
+  const defaultBadges = [
+    "https://cdn-icons-png.freepik.com/512/11820/11820285.png", // Verificado
+  ];
+
+  let profileData = {
+    name: "",
+    profilePic: "",
+    cover: "",
+    badge: "",
+    followers: "",
+    info: "",
+    photos: [],
+    friends: [],
+    posts: [],
+    characters: []
+  };
+
+  window.onload = () => {
+    loadProfile();
+    renderAll();
+  };
+
+  function toggleEditMode() {
+    isEditor = !isEditor;
+    document.body.classList.toggle('editor-active', isEditor);
+    document.getElementById('profile-name').contentEditable = isEditor;
+    document.getElementById('followers-count').contentEditable = isEditor;
+    renderAll();
   }
 
-  const now = new Date();
-  const currentMinutes = now.getHours() * 60 + now.getMinutes();
+  function resetProfile() {
+    if (!confirm('¿Estás seguro de que quieres resetear todo el perfil? Esta acción no se puede deshacer.')) {
+      return;
+    }
+    if (!confirm('CONFIRMACIÓN FINAL: ¿Eliminar TODOS los datos del perfil?')) {
+      return;
+    }
+    
+    profileData = {
+      name: "",
+      profilePic: "",
+      cover: "",
+      badge: "",
+      followers: "",
+      info: "",
+      photos: [],
+      friends: [],
+      posts: [],
+      characters: []
+    };
+    
+    saveProfile();
+    renderAll();
+    alert('Perfil reseteado correctamente');
+  }
 
-  if (!['sabado', 'domingo'].includes(todayName)) {
-    // Resaltar columna del día
-    document.querySelectorAll(`.${todayName}-col`).forEach(cell => {
-      cell.tagName === 'TH' ? cell.classList.add('highlight-header') : cell.classList.add('highlight-cell');
-    });
+  function renderAll() {
+    const nameEl = document.getElementById('profile-name');
+    nameEl.innerHTML = (profileData.name || '') + (profileData.badge ? `<img class="badge" src="${profileData.badge}" alt="✓">` : '');
+    
+    document.getElementById('profile-pic').src = profileData.profilePic || '';
+    document.getElementById('cover-photo').src = profileData.cover || '';
+    document.getElementById('followers-count').textContent = profileData.followers || '';
 
-    // Resaltar hora actual
-    document.querySelectorAll('.time-slot').forEach(slot => {
-      const [start, end] = slot.textContent.split(' - ').map(timeToMinutes);
-      if (currentMinutes >= start && currentMinutes < end) {
-        slot.classList.add('highlight-time');
+    document.getElementById('info-display').innerHTML = profileData.info || '<span style="color:#65676b">Añade información sobre ti</span>';
+    document.getElementById('info-text').value = profileData.info;
+
+    document.getElementById('cover-photo').onclick = isEditor ? () => changeImage(src => { profileData.cover = src; saveProfile(); renderAll(); }) : null;
+    document.getElementById('profile-pic').onclick = isEditor ? () => changeImage(src => { profileData.profilePic = src; saveProfile(); renderAll(); }) : null;
+    
+    nameEl.oninput = () => { 
+      const text = nameEl.textContent.trim();
+      profileData.name = text;
+      saveProfile();
+    };
+    
+    document.getElementById('followers-count').oninput = () => {
+      profileData.followers = document.getElementById('followers-count').textContent.trim();
+      saveProfile();
+    };
+
+    document.getElementById('info-text').oninput = () => { 
+      profileData.info = document.getElementById('info-text').value; 
+      saveProfile(); 
+      renderAll(); 
+    };
+
+    renderPhotos();
+    renderFriends();
+    renderPosts();
+  }
+
+  function chooseBadge(target) {
+    const choice = prompt(`Elige insignia (1) o pega URL propia:\n1. Verificado\nO pega tu URL:\n(Deja vacío para quitar)`, "");
+    let url = "";
+    if (choice === "1") {
+      url = defaultBadges[0];
+    } else if (choice && choice.startsWith('http')) {
+      url = choice;
+    } else if (choice === "0" || choice === "") {
+      url = "";
+    }
+
+    if (target === 'main') {
+      profileData.badge = url;
+      saveProfile();
+      renderAll();
+    } else if (target === 'friend') {
+      tempFriendBadge = url;
+      document.getElementById('friend-badge-preview').innerHTML = url ? `<img src="${url}" width="14" style="border-radius:50%;">` : "Ninguna";
+    } else if (target === 'character') {
+      tempCharBadge = url;
+      document.getElementById('char-badge-preview').innerHTML = url ? `<img src="${url}" width="14" style="border-radius:50%;">` : "Ninguna";
+    }
+  }
+
+  function renderPhotos() {
+    const container = document.getElementById('photos-container');
+    if (!profileData.photos || profileData.photos.length === 0) {
+      container.innerHTML = '';
+      return;
+    }
+    
+    container.innerHTML = profileData.photos.map((photo, i) => `
+      <div class="photo-item">
+        <img src="${photo}" alt="Foto">
+        ${isEditor ? `<button onclick="deletePhoto(${i})">×</button>` : ''}
+      </div>
+    `).join('');
+  }
+
+  function deletePhoto(index) {
+    profileData.photos.splice(index, 1);
+    saveProfile();
+    renderPhotos();
+  }
+
+  function openAddPhotoModal() {
+    document.getElementById('add-photo-modal').style.display = 'flex';
+    tempPhoto = null;
+    document.getElementById('photo-name').textContent = "Sin foto seleccionada";
+    
+    const input = document.getElementById('photo-input');
+    input.value = '';
+    input.onchange = function(e) {
+      const file = e.target.files[0];
+      if (file) {
+        const reader = new FileReader();
+        reader.onload = () => {
+          tempPhoto = reader.result;
+          document.getElementById('photo-name').textContent = file.name;
+        };
+        reader.readAsDataURL(file);
       }
+    };
+  }
+
+  function closeAddPhotoModal() {
+    document.getElementById('add-photo-modal').style.display = 'none';
+  }
+
+  function savePhoto() {
+    if (!tempPhoto) return alert("Selecciona una foto");
+    if (!profileData.photos) profileData.photos = [];
+    profileData.photos.push(tempPhoto);
+    saveProfile();
+    renderPhotos();
+    closeAddPhotoModal();
+  }
+
+  function renderFriends() {
+    const container = document.getElementById('friends-container');
+    if (!profileData.friends || profileData.friends.length === 0) {
+      container.innerHTML = '';
+      return;
+    }
+    
+    container.innerHTML = profileData.friends.map((f, i) => `
+      <div class="friend-item">
+        ${isEditor ? `<button onclick="deleteFriend(${i})">×</button>` : ''}
+        <img src="${f.pic || 'https://via.placeholder.com/110?text=Amigo'}">
+        <div class="friend-name">
+          ${f.name}
+          ${f.badge ? `<img class="friend-badge" src="${f.badge}" alt="✓">` : ''}
+        </div>
+      </div>
+    `).join('');
+  }
+
+  function deleteFriend(index) {
+    profileData.friends.splice(index, 1);
+    saveProfile();
+    renderFriends();
+  }
+
+  function renderPosts() {
+    document.getElementById('posts-container').innerHTML = profileData.posts.map((post, i) => {
+      const hasReactions = post.reactions && post.reactions.trim() !== '';
+      const hasComments = post.comments && post.comments.trim() !== '';
+      const hasShares = post.shares && post.shares.trim() !== '';
+      const showBar = hasReactions || hasComments || hasShares;
+
+      return `
+      <div class="post">
+        <div class="post-header">
+          <img src="${profileData.profilePic || 'https://via.placeholder.com/40'}" alt="">
+          <div>
+            <div class="post-author">
+              ${profileData.name || 'Usuario'}
+              ${profileData.badge ? `<img class="badge" src="${profileData.badge}" style="width:18px;height:18px;">` : ''}
+            </div>
+            <div class="post-time" contenteditable="${isEditor}" oninput="profileData.posts[${i}].time=this.textContent;saveProfile()">${post.time || "Ahora mismo"} · 🌐</div>
+          </div>
+          ${isEditor ? `
+            <button style="margin-left:auto;background:none;border:none;font-size:24px;cursor:pointer;" onclick="deletePost(${i})">×</button>
+          ` : ''}
+        </div>
+        <div class="post-content" contenteditable="${isEditor}" oninput="profileData.posts[${i}].text=this.innerHTML;saveProfile()">${post.text}</div>
+        ${post.image ? `<img src="${post.image}" class="post-image" onclick="${isEditor ? `changePostImage(${i})` : ''}">` : ''}
+
+        ${showBar ? `
+        <div class="reactions-bar">
+          <div class="reaction-summary" onclick="${isEditor ? `openReactionsModal(${i})` : ''}" style="cursor:${isEditor ? 'pointer' : 'default'};">
+            ${hasReactions ? `
+              <div class="reaction-icons">
+                <span>👍</span>
+                <span>❤️</span>
+                <span>😆</span>
+              </div>
+              <span class="reaction-count">${post.reactions}</span>
+            ` : ''}
+          </div>
+          <div class="comments-shares" onclick="${isEditor ? `openReactionsModal(${i})` : ''}" style="cursor:${isEditor ? 'pointer' : 'default'};">
+            ${hasComments ? `${post.comments} comentario${post.comments === '1' ? '' : 's'}` : ''}
+            ${hasComments && hasShares ? ' · ' : ''}
+            ${hasShares ? `${post.shares} compartido${post.shares === '1' ? '' : 's'}` : ''}
+          </div>
+        </div>
+        ` : (isEditor ? `
+        <div class="reactions-bar" onclick="openReactionsModal(${i})" style="cursor:pointer; justify-content:center; color:#65676b;">
+          <span>+ Añadir reacciones</span>
+        </div>
+        ` : '')}
+
+        ${post.commentsData && post.commentsData.length > 0 ? `
+        <div class="comments-section visible">
+          ${post.commentsData.map((comment, ci) => `
+            <div class="comment-item">
+              <img src="${comment.pic || 'https://via.placeholder.com/32'}" alt="">
+              <div class="comment-bubble">
+                <div class="comment-author">
+                  ${comment.author}
+                  ${comment.badge ? `<img class="comment-badge" src="${comment.badge}" alt="✓">` : ''}
+                </div>
+                <div class="comment-text">${comment.text}</div>
+              </div>
+            </div>
+          `).join('')}
+          ${isEditor ? `<button onclick="openCommentsModal(${i})" style="margin-top:8px; font-size:13px; background:var(--fb-gray); padding:6px 12px; border-radius:6px; border:none; cursor:pointer;">Editar comentarios</button>` : ''}
+        </div>
+        ` : (isEditor ? `
+        <div style="padding:12px 16px; border-top:1px solid #e4e6eb;">
+          <button onclick="openCommentsModal(${i})" style="font-size:13px; background:var(--fb-gray); padding:6px 12px; border-radius:6px; border:none; cursor:pointer;">+ Añadir comentarios</button>
+        </div>
+        ` : '')}
+      </div>
+    `}).join('');
+  }
+
+  function deletePost(index) {
+    if (confirm('¿Eliminar esta publicación?')) {
+      profileData.posts.splice(index, 1);
+      saveProfile();
+      renderPosts();
+    }
+  }
+
+  function openReactionsModal(postIndex) {
+    if (!isEditor) return;
+    currentPostForReactions = postIndex;
+    const post = profileData.posts[postIndex];
+    document.getElementById('reaction-total').value = post.reactions || '';
+    document.getElementById('reaction-comments').value = post.comments || '';
+    document.getElementById('reaction-shares').value = post.shares || '';
+    document.getElementById('reactions-modal').style.display = 'flex';
+  }
+
+  function closeReactionsModal() {
+    document.getElementById('reactions-modal').style.display = 'none';
+  }
+
+  function saveReactions() {
+    if (currentPostForReactions === -1) return;
+    const post = profileData.posts[currentPostForReactions];
+    post.reactions = document.getElementById('reaction-total').value.trim();
+    post.comments = document.getElementById('reaction-comments').value.trim();
+    post.shares = document.getElementById('reaction-shares').value.trim();
+    saveProfile();
+    renderPosts();
+    closeReactionsModal();
+  }
+
+  function switchTab(tab) {
+    currentTab = tab;
+    if (tab === 'comments') {
+      document.getElementById('comments-tab-content').style.display = 'block';
+      document.getElementById('characters-tab-content').style.display = 'none';
+      document.getElementById('tab-comments').style.borderBottom = '3px solid var(--fb-blue)';
+      document.getElementById('tab-comments').style.fontWeight = '600';
+      document.getElementById('tab-characters').style.borderBottom = '3px solid transparent';
+      document.getElementById('tab-characters').style.fontWeight = '400';
+    } else {
+      document.getElementById('comments-tab-content').style.display = 'none';
+      document.getElementById('characters-tab-content').style.display = 'block';
+      document.getElementById('tab-comments').style.borderBottom = '3px solid transparent';
+      document.getElementById('tab-comments').style.fontWeight = '400';
+      document.getElementById('tab-characters').style.borderBottom = '3px solid var(--fb-blue)';
+      document.getElementById('tab-characters').style.fontWeight = '600';
+      renderCharactersList();
+    }
+  }
+
+  function openCommentsModal(postIndex) {
+    if (!isEditor) return;
+    currentPostForComments = postIndex;
+    const post = profileData.posts[postIndex];
+    if (!post.commentsData) post.commentsData = [];
+    
+    selectedCharacter = null;
+    document.getElementById('selected-character-name').textContent = '';
+    switchTab('comments');
+    renderCommentsInModal();
+    document.getElementById('comments-modal').style.display = 'flex';
+  }
+
+  function renderCommentsInModal() {
+    const post = profileData.posts[currentPostForComments];
+    document.getElementById('comments-list').innerHTML = post.commentsData.map((comment, i) => `
+      <div style="display:flex; justify-content:space-between; align-items:start; padding:8px; background:#f0f2f5; border-radius:8px; margin-bottom:8px;">
+        <div style="flex:1;">
+          <div style="display:flex; align-items:center; gap:8px; margin-bottom:4px;">
+            <img src="${comment.pic || 'https://via.placeholder.com/32'}" style="width:24px; height:24px; border-radius:50%;" alt="">
+            <strong>${comment.author}</strong>
+            ${comment.badge ? `<img src="${comment.badge}" width="14" style="border-radius:50%;">` : ''}
+          </div>
+          <div style="padding-left:32px;">${comment.text}</div>
+        </div>
+        <button onclick="removeComment(${i})" style="background:red; color:white; border:none; padding:4px 8px; border-radius:4px; cursor:pointer; flex-shrink:0;">×</button>
+      </div>
+    `).join('');
+    
+    document.getElementById('new-comment-text').value = '';
+  }
+
+  function openCharacterSelector() {
+    renderCharacterSelectorList();
+    document.getElementById('character-selector-modal').style.display = 'flex';
+  }
+
+  function renderCharacterSelectorList() {
+    const profileChar = {
+      name: profileData.name || 'Mi Perfil',
+      pic: profileData.profilePic || 'https://via.placeholder.com/40',
+      badge: profileData.badge,
+      isProfile: true
+    };
+
+    const allChars = [profileChar, ...(profileData.characters || [])];
+
+    document.getElementById('character-selector-list').innerHTML = allChars.map((char, i) => `
+      <div class="character-item ${char.isProfile ? 'profile-character' : ''}" onclick="selectCharacterForComment(${i - 1})">
+        <img src="${char.pic}" alt="">
+        <div style="flex:1;">
+          <strong>${char.name}</strong>
+          ${char.badge ? `<img src="${char.badge}" width="14" style="border-radius:50%; margin-left:4px; vertical-align:middle;">` : ''}
+          ${char.isProfile ? '<span style="color:var(--fb-blue); font-size:12px; margin-left:8px;">(Tu perfil)</span>' : ''}
+        </div>
+      </div>
+    `).join('');
+  }
+
+  function selectCharacterForComment(index) {
+    if (index === -1) {
+      // Perfil principal
+      selectedCharacter = {
+        name: profileData.name || 'Mi Perfil',
+        pic: profileData.profilePic || 'https://via.placeholder.com/32',
+        badge: profileData.badge
+      };
+    } else {
+      selectedCharacter = profileData.characters[index];
+    }
+    
+    document.getElementById('selected-character-name').textContent = selectedCharacter.name;
+    closeCharacterSelector();
+  }
+
+  function closeCharacterSelector() {
+    document.getElementById('character-selector-modal').style.display = 'none';
+  }
+
+  function addCommentToPost() {
+    if (!selectedCharacter) return alert("Selecciona un personaje primero");
+    
+    const text = document.getElementById('new-comment-text').value.trim();
+    if (!text) return alert("Escribe un comentario");
+    
+    const post = profileData.posts[currentPostForComments];
+    if (!post.commentsData) post.commentsData = [];
+    
+    post.commentsData.push({
+      author: selectedCharacter.name,
+      text: text,
+      pic: selectedCharacter.pic,
+      badge: selectedCharacter.badge || ''
     });
+    
+    saveProfile();
+    renderCommentsInModal();
+    selectedCharacter = null;
+    document.getElementById('selected-character-name').textContent = '';
+  }
+
+  function removeComment(commentIndex) {
+    const post = profileData.posts[currentPostForComments];
+    post.commentsData.splice(commentIndex, 1);
+    saveProfile();
+    renderCommentsInModal();
+  }
+
+  function renderCharactersList() {
+    const profileChar = {
+      name: profileData.name || 'Mi Perfil',
+      pic: profileData.profilePic || 'https://via.placeholder.com/40',
+      badge: profileData.badge,
+      isProfile: true
+    };
+
+    const allChars = [profileChar, ...(profileData.characters || [])];
+
+    document.getElementById('characters-list').innerHTML = allChars.map((char, i) => {
+      if (char.isProfile) {
+        return `
+          <div class="character-item profile-character">
+            <img src="${char.pic}" alt="">
+            <div style="flex:1;">
+              <strong>${char.name}</strong>
+              ${char.badge ? `<img src="${char.badge}" width="14" style="border-radius:50%; margin-left:4px; vertical-align:middle;">` : ''}
+              <div style="color:var(--fb-blue); font-size:12px;">Tu perfil (se actualiza automáticamente)</div>
+            </div>
+          </div>
+        `;
+      } else {
+        return `
+          <div class="character-item">
+            <img src="${char.pic}" alt="">
+            <div style="flex:1;">
+              <strong>${char.name}</strong>
+              ${char.badge ? `<img src="${char.badge}" width="14" style="border-radius:50%; margin-left:4px; vertical-align:middle;">` : ''}
+            </div>
+            <button onclick="deleteCharacter(${i - 1})" style="background:red; color:white; border:none; padding:6px 12px; border-radius:6px; cursor:pointer;">Eliminar</button>
+          </div>
+        `;
+      }
+    }).join('');
+  }
+
+  function saveCharacter() {
+    const name = document.getElementById('new-char-name').value.trim();
+    const pic = document.getElementById('new-char-pic').value.trim();
+    
+    if (!name) return alert("Escribe un nombre para el personaje");
+    if (!pic) return alert("Añade una URL de foto");
+    
+    if (!profileData.characters) profileData.characters = [];
+    
+    profileData.characters.push({
+      name: name,
+      pic: pic,
+      badge: tempCharBadge
+    });
+    
+    document.getElementById('new-char-name').value = '';
+    document.getElementById('new-char-pic').value = '';
+    tempCharBadge = '';
+    document.getElementById('char-badge-preview').innerHTML = '';
+    
+    saveProfile();
+    renderCharactersList();
+    alert('Personaje guardado correctamente');
+  }
+
+  function deleteCharacter(index) {
+    if (confirm('¿Eliminar este personaje?')) {
+      profileData.characters.splice(index, 1);
+      saveProfile();
+      renderCharactersList();
+    }
+  }
+
+  function closeCommentsModal() {
+    document.getElementById('comments-modal').style.display = 'none';
+    renderPosts();
+  }
+
+  function openAddFriendModal() {
+    document.getElementById('add-friend-modal').style.display = 'flex';
+    tempFriendPic = null;
+    tempFriendBadge = "";
+    document.getElementById('friend-name').value = "";
+    document.getElementById('friend-pic-name').textContent = "Sin foto";
+    document.getElementById('friend-badge-preview').innerHTML = "";
+    
+    const input = document.getElementById('friend-pic-input');
+    input.value = '';
+    input.onchange = function(e) {
+      const file = e.target.files[0];
+      if (file) {
+        const reader = new FileReader();
+        reader.onload = () => {
+          tempFriendPic = reader.result;
+          document.getElementById('friend-pic-name').textContent = file.name;
+        };
+        reader.readAsDataURL(file);
+      }
+    };
+  }
+
+  function closeAddFriendModal() {
+    document.getElementById('add-friend-modal').style.display = 'none';
+  }
+
+  function saveFriend() {
+    const name = document.getElementById('friend-name').value.trim();
+    if (!name) return alert("Escribe un nombre");
+    if (!profileData.friends) profileData.friends = [];
+    profileData.friends.push({
+      name,
+      pic: tempFriendPic || "https://via.placeholder.com/110?text=" + name[0],
+      badge: tempFriendBadge
+    });
+    saveProfile();
+    renderFriends();
+    closeAddFriendModal();
+  }
+
+  function addPostImage() {
+    const input = document.createElement('input');
+    input.type = 'file';
+    input.accept = 'image/*';
+    input.onchange = e => {
+      const file = e.target.files[0];
+      if (!file) return;
+      const reader = new FileReader();
+      reader.onload = () => {
+        tempPostImage = reader.result;
+        alert('Imagen seleccionada. Ahora escribe tu texto y presiona Publicar.');
+      };
+      reader.readAsDataURL(file);
+    };
+    input.click();
+  }
+
+  function changePostImage(i) {
+    const input = document.createElement('input');
+    input.type = 'file';
+    input.accept = 'image/*';
+    input.onchange = e => {
+      const file = e.target.files[0];
+      if (!file) return;
+      const reader = new FileReader();
+      reader.onload = () => {
+        profileData.posts[i].image = reader.result;
+        saveProfile();
+        renderPosts();
+      };
+      reader.readAsDataURL(file);
+    };
+    input.click();
+  }
+
+  function createNewPost() {
+    const text = document.getElementById('new-post-text').value.trim();
+    if (!text && !tempPostImage) return alert('Escribe algo o añade una foto');
+    
+    if (!profileData.posts) profileData.posts = [];
+    
+    profileData.posts.unshift({
+      text: text.replace(/@([\wáéíóúñ]+)/gi, '<a href="#">@$1</a>'),
+      image: tempPostImage,
+      reactions: '',
+      comments: '',
+      shares: '',
+      commentsData: [],
+      time: "Ahora mismo"
+    });
+    
+    tempPostImage = null;
+    document.getElementById('new-post-text').value = '';
+    saveProfile();
+    renderPosts();
+  }
+
+  function changeImage(callback) {
+    const input = document.createElement('input');
+    input.type = 'file';
+    input.accept = 'image/*';
+    input.onchange = e => {
+      const file = e.target.files[0];
+      if (!file) return;
+      const reader = new FileReader();
+      reader.onload = () => {
+        callback(reader.result);
+        renderAll();
+      };
+      reader.readAsDataURL(file);
+    };
+    input.click();
+  }
+
+  function saveProfile() {
+    localStorage.setItem('fbProfile2025', JSON.stringify(profileData));
+  }
+
+  function loadProfile() {
+    const saved = localStorage.getItem('fbProfile2025');
+    if (saved) {
+      try {
+        profileData = JSON.parse(saved);
+        if (!profileData.photos) profileData.photos = [];
+        if (!profileData.friends) profileData.friends = [];
+        if (!profileData.posts) profileData.posts = [];
+        if (!profileData.characters) profileData.characters = [];
+      } catch (e) {
+        console.error('Error al cargar perfil:', e);
+      }
+    }
+  }
+
+  function exportProfile() {
+    const data = JSON.stringify(profileData, null, 2);
+    const blob = new Blob([data], {type: 'application/json'});
+    const url = URL.createObjectURL(blob);
+    const a = document.createElement('a');
+    a.href = url;
+    a.download = 'perfil-facebook.json';
+    a.click();
+    URL.revokeObjectURL(url);
+  }
+
+  function importProfile(e) {
+    const file = e.target.files[0];
+    if (!file) return;
+    const reader = new FileReader();
+    reader.onload = ev => {
+      try {
+        profileData = JSON.parse(ev.target.result);
+        if (!profileData.photos) profileData.photos = [];
+        if (!profileData.friends) profileData.friends = [];
+        if (!profileData.posts) profileData.posts = [];
+        if (!profileData.characters) profileData.characters = [];
+        saveProfile();
+        renderAll();
+        alert("Perfil importado correctamente");
+      } catch (error) {
+        alert("Error al importar el archivo");
+      }
+    };
+    reader.readAsText(file);
   }
 </script>
-
 </body>
 </html>
