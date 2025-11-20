@@ -90,13 +90,13 @@
       margin-bottom: 4px;
     }
     .badge {
-      width: 20px;
-      height: 20px;
+      width: 24px;
+      height: 24px;
       border-radius: 50%;
     }
     .comment-badge {
-      width: 14px;
-      height: 14px;
+      width: 12px;
+      height: 12px;
       border-radius: 50%;
       margin-left: 4px;
       vertical-align: middle;
@@ -257,8 +257,8 @@
       gap: 4px;
     }
     .friend-badge {
-      width: 13px;
-      height: 13px;
+      width: 10px;
+      height: 10px;
       border-radius: 50%;
       flex-shrink: 0;
     }
@@ -276,6 +276,10 @@
       z-index: 10;
       font-size: 18px;
       line-height: 24px;
+    }
+    .friend-item .edit-btn {
+      right: 32px;
+      background: rgba(0,0,0,0.7);
     }
 
     /* Modal */
@@ -365,11 +369,11 @@
       height: 40px;
       border-radius: 50%;
     }
-    .character-item.profile-character {
+    .character-item.profile-character, .character-item.friend-character {
       border: 2px solid var(--fb-blue);
       cursor: default;
     }
-    .character-item.profile-character:hover {
+    .character-item.profile-character:hover, .character-item.friend-character:hover {
       background: #f0f2f5;
     }
 
@@ -431,7 +435,7 @@
       <div class="card">
         <div style="display:flex;justify-content:space-between;align-items:center;">
           <h3>Fotos</h3>
-          <button class="edit-mode-only" onclick="openAddPhotoModal()">+ Añadir foto</button>
+          <button class="edit-mode-only" onclick="openAddPhotoModal()">+ Añadir fotos</button>
         </div>
         <div class="photos-grid" id="photos-container"></div>
       </div>
@@ -439,7 +443,7 @@
       <div class="card">
         <div style="display:flex;justify-content:space-between;align-items:center;">
           <h3>Amigos</h3>
-          <button class="edit-mode-only" onclick="openAddFriendModal()">+ Añadir amigo</button>
+          <button class="edit-mode-only" onclick="openAddFriendModal(-1)">+ Añadir amigo</button>
         </div>
         <div class="friends-grid" id="friends-container"></div>
       </div>
@@ -463,23 +467,23 @@
 <!-- Modal Añadir Foto -->
 <div class="modal" id="add-photo-modal" style="display:none;">
   <div class="modal-content">
-    <h3>Añadir Foto</h3>
+    <h3>Añadir Fotos</h3>
     <p>
-      <button onclick="document.getElementById('photo-input').click()">Seleccionar foto</button>
-      <input type="file" id="photo-input" style="display:none;" accept="image/*">
-      <span id="photo-name">Sin foto seleccionada</span>
+      <button onclick="document.getElementById('photo-input').click()">Seleccionar fotos</button>
+      <input type="file" id="photo-input" style="display:none;" accept="image/*" multiple>
+      <span id="photo-name">Sin fotos seleccionadas</span>
     </p>
     <div style="margin-top:20px; text-align:right;">
       <button onclick="closeAddPhotoModal()">Cancelar</button>
-      <button style="background:var(--fb-blue);color:white;" onclick="savePhoto()">Añadir</button>
+      <button style="background:var(--fb-blue);color:white;" onclick="savePhotos()">Añadir</button>
     </div>
   </div>
 </div>
 
-<!-- Modal Añadir Amigo -->
+<!-- Modal Añadir/Editar Amigo -->
 <div class="modal" id="add-friend-modal" style="display:none;">
   <div class="modal-content">
-    <h3>Añadir Amigo</h3>
+    <h3 id="friend-modal-title">Añadir Amigo</h3>
     <p>Nombre: <input type="text" id="friend-name"></p>
     <p>Foto: <button onclick="document.getElementById('friend-pic-input').click()">Seleccionar foto</button>
       <input type="file" id="friend-pic-input" style="display:none;" accept="image/*">
@@ -488,7 +492,7 @@
     <p>Insignia: <button onclick="chooseBadge('friend')">Elegir insignia</button> <span id="friend-badge-preview"></span></p>
     <div style="margin-top:20px; text-align:right;">
       <button onclick="closeAddFriendModal()">Cancelar</button>
-      <button style="background:var(--fb-blue);color:white;" onclick="saveFriend()">Añadir</button>
+      <button style="background:var(--fb-blue);color:white;" onclick="saveFriend()">Guardar</button>
     </div>
   </div>
 </div>
@@ -566,12 +570,13 @@
   let tempPostImage = null;
   let tempFriendPic = null;
   let tempFriendBadge = "";
-  let tempPhoto = null;
+  let tempPhotos = [];
   let currentPostForReactions = -1;
   let currentPostForComments = -1;
   let selectedCharacter = null;
   let tempCharBadge = "";
   let currentTab = 'comments';
+  let editingFriendIndex = -1;
 
   const defaultBadges = [
     "https://cdn-icons-png.freepik.com/512/11820/11820285.png", // Verificado
@@ -647,6 +652,7 @@
       const text = nameEl.textContent.trim();
       profileData.name = text;
       saveProfile();
+      updateCommentsWithProfileChanges();
     };
     
     document.getElementById('followers-count').oninput = () => {
@@ -665,6 +671,35 @@
     renderPosts();
   }
 
+  function updateCommentsWithProfileChanges() {
+    // Actualizar comentarios cuando cambia el perfil o amigos
+    profileData.posts.forEach(post => {
+      if (post.commentsData) {
+        post.commentsData.forEach(comment => {
+          // Actualizar si es el perfil principal
+          if (comment.isProfile) {
+            comment.author = profileData.name || 'Mi Perfil';
+            comment.pic = profileData.profilePic || 'https://via.placeholder.com/32';
+            comment.badge = profileData.badge;
+          }
+          
+          // Actualizar si es un amigo
+          if (comment.friendIndex !== undefined && comment.friendIndex >= 0) {
+            const friend = profileData.friends[comment.friendIndex];
+            if (friend) {
+              comment.author = friend.name;
+              comment.pic = friend.pic;
+              comment.badge = friend.badge;
+            }
+          }
+        });
+      }
+    });
+    
+    saveProfile();
+    renderPosts();
+  }
+
   function chooseBadge(target) {
     const choice = prompt(`Elige insignia (1) o pega URL propia:\n1. Verificado\nO pega tu URL:\n(Deja vacío para quitar)`, "");
     let url = "";
@@ -680,6 +715,7 @@
       profileData.badge = url;
       saveProfile();
       renderAll();
+      updateCommentsWithProfileChanges();
     } else if (target === 'friend') {
       tempFriendBadge = url;
       document.getElementById('friend-badge-preview').innerHTML = url ? `<img src="${url}" width="14" style="border-radius:50%;">` : "Ninguna";
@@ -712,20 +748,28 @@
 
   function openAddPhotoModal() {
     document.getElementById('add-photo-modal').style.display = 'flex';
-    tempPhoto = null;
-    document.getElementById('photo-name').textContent = "Sin foto seleccionada";
+    tempPhotos = [];
+    document.getElementById('photo-name').textContent = "Sin fotos seleccionadas";
     
     const input = document.getElementById('photo-input');
     input.value = '';
     input.onchange = function(e) {
-      const file = e.target.files[0];
-      if (file) {
-        const reader = new FileReader();
-        reader.onload = () => {
-          tempPhoto = reader.result;
-          document.getElementById('photo-name').textContent = file.name;
-        };
-        reader.readAsDataURL(file);
+      const files = Array.from(e.target.files);
+      if (files.length > 0) {
+        tempPhotos = [];
+        let loaded = 0;
+        
+        files.forEach(file => {
+          const reader = new FileReader();
+          reader.onload = () => {
+            tempPhotos.push(reader.result);
+            loaded++;
+            if (loaded === files.length) {
+              document.getElementById('photo-name').textContent = `${files.length} foto${files.length > 1 ? 's' : ''} seleccionada${files.length > 1 ? 's' : ''}`;
+            }
+          };
+          reader.readAsDataURL(file);
+        });
       }
     };
   }
@@ -734,10 +778,10 @@
     document.getElementById('add-photo-modal').style.display = 'none';
   }
 
-  function savePhoto() {
-    if (!tempPhoto) return alert("Selecciona una foto");
+  function savePhotos() {
+    if (tempPhotos.length === 0) return alert("Selecciona al menos una foto");
     if (!profileData.photos) profileData.photos = [];
-    profileData.photos.push(tempPhoto);
+    profileData.photos.push(...tempPhotos);
     saveProfile();
     renderPhotos();
     closeAddPhotoModal();
@@ -749,10 +793,12 @@
       container.innerHTML = '';
       return;
     }
-    
     container.innerHTML = profileData.friends.map((f, i) => `
       <div class="friend-item">
-        ${isEditor ? `<button onclick="deleteFriend(${i})">×</button>` : ''}
+        ${isEditor ? `
+          <button class="edit-btn" onclick="openAddFriendModal(${i})">✏️</button>
+          <button onclick="deleteFriend(${i})">×</button>
+        ` : ''}
         <img src="${f.pic || 'https://via.placeholder.com/110?text=Amigo'}">
         <div class="friend-name">
           ${f.name}
@@ -763,9 +809,23 @@
   }
 
   function deleteFriend(index) {
-    profileData.friends.splice(index, 1);
-    saveProfile();
-    renderFriends();
+    if (confirm('¿Eliminar este amigo?')) {
+      const friend = profileData.friends[index];
+      
+      // Convertir amigo a personaje editable
+      if (!profileData.characters) profileData.characters = [];
+      profileData.characters.push({
+        name: friend.name,
+        pic: friend.pic,
+        badge: friend.badge,
+        fromFriend: true
+      });
+      
+      profileData.friends.splice(index, 1);
+      saveProfile();
+      renderFriends();
+      updateCommentsWithProfileChanges();
+    }
   }
 
   function renderPosts() {
@@ -916,7 +976,7 @@
           <div style="display:flex; align-items:center; gap:8px; margin-bottom:4px;">
             <img src="${comment.pic || 'https://via.placeholder.com/32'}" style="width:24px; height:24px; border-radius:50%;" alt="">
             <strong>${comment.author}</strong>
-            ${comment.badge ? `<img src="${comment.badge}" width="14" style="border-radius:50%;">` : ''}
+            ${comment.badge ? `<img src="${comment.badge}" width="12" style="border-radius:50%;">` : ''}
           </div>
           <div style="padding-left:32px;">${comment.text}</div>
         </div>
@@ -940,32 +1000,48 @@
       isProfile: true
     };
 
-    const allChars = [profileChar, ...(profileData.characters || [])];
+    const friendChars = (profileData.friends || []).map((f, idx) => ({
+      name: f.name,
+      pic: f.pic,
+      badge: f.badge,
+      isFriend: true,
+      friendIndex: idx
+    }));
+
+    const allChars = [profileChar, ...friendChars, ...(profileData.characters || [])];
 
     document.getElementById('character-selector-list').innerHTML = allChars.map((char, i) => `
-      <div class="character-item ${char.isProfile ? 'profile-character' : ''}" onclick="selectCharacterForComment(${i - 1})">
+      <div class="character-item ${char.isProfile ? 'profile-character' : ''} ${char.isFriend ? 'friend-character' : ''}" onclick="selectCharacterForComment(${i})">
         <img src="${char.pic}" alt="">
         <div style="flex:1;">
           <strong>${char.name}</strong>
-          ${char.badge ? `<img src="${char.badge}" width="14" style="border-radius:50%; margin-left:4px; vertical-align:middle;">` : ''}
+          ${char.badge ? `<img src="${char.badge}" width="12" style="border-radius:50%; margin-left:4px; vertical-align:middle;">` : ''}
           ${char.isProfile ? '<span style="color:var(--fb-blue); font-size:12px; margin-left:8px;">(Tu perfil)</span>' : ''}
+          ${char.isFriend ? '<span style="color:#65676b; font-size:12px; margin-left:8px;">(Amigo)</span>' : ''}
         </div>
       </div>
     `).join('');
   }
 
   function selectCharacterForComment(index) {
-    if (index === -1) {
-      // Perfil principal
-      selectedCharacter = {
-        name: profileData.name || 'Mi Perfil',
-        pic: profileData.profilePic || 'https://via.placeholder.com/32',
-        badge: profileData.badge
-      };
-    } else {
-      selectedCharacter = profileData.characters[index];
-    }
+    const profileChar = {
+      name: profileData.name || 'Mi Perfil',
+      pic: profileData.profilePic || 'https://via.placeholder.com/32',
+      badge: profileData.badge,
+      isProfile: true
+    };
+
+    const friendChars = (profileData.friends || []).map((f, idx) => ({
+      name: f.name,
+      pic: f.pic,
+      badge: f.badge,
+      isFriend: true,
+      friendIndex: idx
+    }));
+
+    const allChars = [profileChar, ...friendChars, ...(profileData.characters || [])];
     
+    selectedCharacter = allChars[index];
     document.getElementById('selected-character-name').textContent = selectedCharacter.name;
     closeCharacterSelector();
   }
@@ -983,12 +1059,21 @@
     const post = profileData.posts[currentPostForComments];
     if (!post.commentsData) post.commentsData = [];
     
-    post.commentsData.push({
+    const commentData = {
       author: selectedCharacter.name,
       text: text,
       pic: selectedCharacter.pic,
       badge: selectedCharacter.badge || ''
-    });
+    };
+    
+    // Marcar si es perfil o amigo para actualizaciones automáticas
+    if (selectedCharacter.isProfile) {
+      commentData.isProfile = true;
+    } else if (selectedCharacter.isFriend) {
+      commentData.friendIndex = selectedCharacter.friendIndex;
+    }
+    
+    post.commentsData.push(commentData);
     
     saveProfile();
     renderCommentsInModal();
@@ -1011,7 +1096,14 @@
       isProfile: true
     };
 
-    const allChars = [profileChar, ...(profileData.characters || [])];
+    const friendChars = (profileData.friends || []).map(f => ({
+      name: f.name,
+      pic: f.pic,
+      badge: f.badge,
+      isFriend: true
+    }));
+
+    const allChars = [profileChar, ...friendChars, ...(profileData.characters || [])];
 
     document.getElementById('characters-list').innerHTML = allChars.map((char, i) => {
       if (char.isProfile) {
@@ -1025,15 +1117,28 @@
             </div>
           </div>
         `;
+      } else if (char.isFriend) {
+        return `
+          <div class="character-item friend-character">
+            <img src="${char.pic}" alt="">
+            <div style="flex:1;">
+              <strong>${char.name}</strong>
+              ${char.badge ? `<img src="${char.badge}" width="14" style="border-radius:50%; margin-left:4px; vertical-align:middle;">` : ''}
+              <div style="color:#65676b; font-size:12px;">Amigo (se actualiza automáticamente)</div>
+            </div>
+          </div>
+        `;
       } else {
+        const realIndex = i - 1 - (profileData.friends || []).length;
         return `
           <div class="character-item">
             <img src="${char.pic}" alt="">
             <div style="flex:1;">
               <strong>${char.name}</strong>
               ${char.badge ? `<img src="${char.badge}" width="14" style="border-radius:50%; margin-left:4px; vertical-align:middle;">` : ''}
+              ${char.fromFriend ? '<div style="color:#65676b; font-size:12px;">(Antes era amigo)</div>' : ''}
             </div>
-            <button onclick="deleteCharacter(${i - 1})" style="background:red; color:white; border:none; padding:6px 12px; border-radius:6px; cursor:pointer;">Eliminar</button>
+            <button onclick="deleteCharacter(${realIndex})" style="background:red; color:white; border:none; padding:6px 12px; border-radius:6px; cursor:pointer;">Eliminar</button>
           </div>
         `;
       }
@@ -1052,7 +1157,8 @@
     profileData.characters.push({
       name: name,
       pic: pic,
-      badge: tempCharBadge
+      badge: tempCharBadge,
+      fromFriend: false
     });
     
     document.getElementById('new-char-name').value = '';
@@ -1078,13 +1184,28 @@
     renderPosts();
   }
 
-  function openAddFriendModal() {
+  function openAddFriendModal(index) {
+    editingFriendIndex = index;
     document.getElementById('add-friend-modal').style.display = 'flex';
-    tempFriendPic = null;
-    tempFriendBadge = "";
-    document.getElementById('friend-name').value = "";
-    document.getElementById('friend-pic-name').textContent = "Sin foto";
-    document.getElementById('friend-badge-preview').innerHTML = "";
+    
+    if (index === -1) {
+      // Añadir nuevo
+      document.getElementById('friend-modal-title').textContent = 'Añadir Amigo';
+      tempFriendPic = null;
+      tempFriendBadge = "";
+      document.getElementById('friend-name').value = "";
+      document.getElementById('friend-pic-name').textContent = "Sin foto";
+      document.getElementById('friend-badge-preview').innerHTML = "";
+    } else {
+      // Editar existente
+      document.getElementById('friend-modal-title').textContent = 'Editar Amigo';
+      const friend = profileData.friends[index];
+      document.getElementById('friend-name').value = friend.name;
+      tempFriendPic = friend.pic;
+      tempFriendBadge = friend.badge || "";
+      document.getElementById('friend-pic-name').textContent = "Foto actual";
+      document.getElementById('friend-badge-preview').innerHTML = friend.badge ? `<img src="${friend.badge}" width="14" style="border-radius:50%;">` : "Ninguna";
+    }
     
     const input = document.getElementById('friend-pic-input');
     input.value = '';
@@ -1103,19 +1224,31 @@
 
   function closeAddFriendModal() {
     document.getElementById('add-friend-modal').style.display = 'none';
+    editingFriendIndex = -1;
   }
 
   function saveFriend() {
     const name = document.getElementById('friend-name').value.trim();
     if (!name) return alert("Escribe un nombre");
     if (!profileData.friends) profileData.friends = [];
-    profileData.friends.push({
+    
+    const friendData = {
       name,
       pic: tempFriendPic || "https://via.placeholder.com/110?text=" + name[0],
       badge: tempFriendBadge
-    });
+    };
+    
+    if (editingFriendIndex === -1) {
+      // Añadir nuevo
+      profileData.friends.push(friendData);
+    } else {
+      // Editar existente
+      profileData.friends[editingFriendIndex] = friendData;
+    }
+    
     saveProfile();
     renderFriends();
+    updateCommentsWithProfileChanges();
     closeAddFriendModal();
   }
 
@@ -1218,7 +1351,7 @@
     const url = URL.createObjectURL(blob);
     const a = document.createElement('a');
     a.href = url;
-    a.download = 'perfil-facebook.json';
+    a.download = 'perfil-fakebook.json';
     a.click();
     URL.revokeObjectURL(url);
   }
@@ -1246,4 +1379,3 @@
 </script>
 </body>
 </html>
-
