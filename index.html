@@ -200,6 +200,7 @@
       margin-bottom: 20px;
       box-shadow: 0 1px 2px rgba(0,0,0,.1);
       overflow: hidden;
+      position: relative;
     }
     .post-header {
       padding: 12px 16px;
@@ -233,6 +234,32 @@
     }
     .post-content a { color: var(--fb-blue); font-weight: 600; }
     .post-image { width: 100%; max-height: 600px; object-fit: cover; cursor: pointer; }
+
+    /* Botones de reordenamiento */
+    .reorder-buttons {
+      position: absolute;
+      top: 12px;
+      right: 50px;
+      display: flex;
+      gap: 4px;
+      z-index: 10;
+    }
+    .reorder-btn {
+      background: rgba(0,0,0,0.6);
+      color: white;
+      border: none;
+      border-radius: 4px;
+      width: 28px;
+      height: 28px;
+      cursor: pointer;
+      font-size: 16px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+    }
+    .reorder-btn:hover {
+      background: rgba(0,0,0,0.8);
+    }
 
     /* Fotos Grid */
     .photos-grid {
@@ -272,6 +299,20 @@
       z-index: 10;
       font-size: 18px;
       line-height: 24px;
+    }
+    .photo-item .reorder-photo-btn {
+      width: 22px;
+      height: 22px;
+      font-size: 14px;
+      line-height: 22px;
+    }
+    .photo-item .move-up {
+      top: 4px;
+      left: 4px;
+    }
+    .photo-item .move-down {
+      top: 32px;
+      left: 4px;
     }
 
     .friends-grid {
@@ -323,6 +364,20 @@
     .friend-item .edit-btn {
       right: 32px;
       background: rgba(0,0,0,0.7);
+    }
+    .friend-item .reorder-friend-btn {
+      width: 22px;
+      height: 22px;
+      font-size: 14px;
+      line-height: 22px;
+    }
+    .friend-item .move-up-friend {
+      top: 4px;
+      left: 4px;
+    }
+    .friend-item .move-down-friend {
+      top: 32px;
+      left: 4px;
     }
 
     /* Modal */
@@ -480,6 +535,7 @@
       background: #f9f9f9;
       border-radius: 8px;
       border-left: 3px solid #ddd;
+      position: relative;
     }
 
     .comment-tree-item.reply {
@@ -493,48 +549,12 @@
       margin-top: 8px;
     }
 
-    /* Image Crop Canvas */
-    .crop-container {
-      position: relative;
-      width: 100%;
-      max-width: 500px;
-      margin: 20px auto;
-      background: #000;
-      border-radius: 8px;
-      overflow: hidden;
-    }
-    .crop-canvas-wrapper {
-      position: relative;
-      width: 100%;
-      height: 400px;
-      overflow: hidden;
-      cursor: move;
-      background: #000;
-    }
-    .crop-canvas {
+    .comment-reorder-buttons {
       position: absolute;
-      max-width: none;
-    }
-    .crop-controls {
-      background: #f0f2f5;
-      padding: 12px;
+      top: 8px;
+      right: 8px;
       display: flex;
-      gap: 12px;
-      align-items: center;
-      justify-content: center;
-      flex-wrap: wrap;
-    }
-    .crop-controls button {
-      background: var(--fb-blue);
-      color: white;
-      border: none;
-      padding: 8px 16px;
-      border-radius: 6px;
-      cursor: pointer;
-      font-weight: 600;
-    }
-    .crop-controls input[type="range"] {
-      width: 150px;
+      gap: 4px;
     }
 
     @media print {
@@ -564,7 +584,7 @@
       <button class="edit-mode-only" onclick="toggleEditMode()">Salir del Editor</button>
     </div>
     <div class="header-right" style="margin-left: auto;">
-      <span class="version-info view-mode-only">Fakebook-Fabijose21-v3.0</span>
+      <span class="version-info view-mode-only">Fakebook-Fabijose21-v4.0</span>
       <button class="edit-mode-only" onclick="openStyleModal()">Personalizar Estilo</button>
       <button class="edit-mode-only reset-btn" onclick="resetProfile()">Resetear Perfil</button>
       <button class="edit-mode-only" onclick="exportProfile()">Exportar</button>
@@ -655,7 +675,7 @@
   </div>
 </div>
 
-<!-- Modal Imagen Upload con Recorte -->
+<!-- Modal Imagen Upload -->
 <div class="modal" id="image-upload-modal" style="display:none; z-index: 2000;">
   <div class="modal-content" style="z-index: 2001; max-width: 600px;">
     <h3 id="image-upload-title">Cambiar Imagen</h3>
@@ -676,29 +696,12 @@
       <p>Link/URL: <input type="url" id="generic-url-input" placeholder="https://..." oninput="previewUrl(event)"></p>
     </div>
     
-    <div id="crop-section" style="display:none;">
-      <div class="crop-container">
-        <div class="crop-canvas-wrapper" id="crop-canvas-wrapper">
-          <img id="crop-canvas" class="crop-canvas" src="" alt="Imagen para recortar">
-        </div>
-        <div class="crop-controls">
-          <label>Zoom: <input type="range" id="zoom-slider" min="50" max="200" value="100" oninput="updateZoom(this.value)"></label>
-          <button onclick="resetCrop()">Reiniciar</button>
-        </div>
-      </div>
-      <p style="text-align:center; color:#65676b; font-size:13px; margin-top:8px;">
-        Arrastra la imagen para reposicionar. Usa el zoom para ajustar el tamaño.
-      </p>
-    </div>
-    
     <div style="text-align:center; margin-top:16px;" id="simple-preview-section">
-        <img id="image-preview" src="" style="max-width:100%; max-height:200px; display:none; border:1px solid #ddd; border-radius:4px;">
+        <img id="image-preview" src="" style="max-width:100%; max-height:300px; display:none; border:1px solid #ddd; border-radius:4px;">
     </div>
 
     <div style="margin-top:20px; text-align:right;">
       <button onclick="closeImageUploadModal()">Cancelar</button>
-      <button id="enable-crop-btn" onclick="enableCropMode()" style="background:#27ae60; color:white; display:none;">Recortar/Mover</button>
-      <button id="use-default-btn" onclick="saveImage()" style="background:#95a5a6; color:white; display:none;">Usar Predeterminado</button>
       <button id="save-image-btn" style="background:var(--fb-blue);color:white;" onclick="saveImage()">Guardar Imagen</button>
     </div>
   </div>
@@ -826,16 +829,6 @@
   let currentImageSourceType = 'file';
   let currentImagePreviewData = null;
   let currentImageCallback = null;
-  
-  // Crop variables
-  let cropMode = false;
-  let cropX = 0;
-  let cropY = 0;
-  let cropZoom = 100;
-  let isDragging = false;
-  let startDragX = 0;
-  let startDragY = 0;
-  let cropOriginalImage = null;
   
   const FONT_OPTIONS = ['Arial', 'Verdana', 'Tahoma', 'Trebuchet MS', 'Times New Roman', 'Georgia', 'Courier New', 'Monospace', 'Segoe UI'];
 
@@ -972,6 +965,7 @@
     renderPosts();
   }
 
+  // FOTOS
   function renderPhotos() {
     const container = document.getElementById('photos-container');
     if (!profileData.photos || profileData.photos.length === 0) {
@@ -982,9 +976,25 @@
     container.innerHTML = profileData.photos.map((photo, i) => `
       <div class="photo-item">
         <img src="${photo}" alt="Foto">
-        ${isEditor ? `<button onclick="deletePhoto(${i})">×</button>` : ''}
+        ${isEditor ? `
+          <button class="reorder-photo-btn move-up" onclick="movePhoto(${i}, -1)" ${i === 0 ? 'style="opacity:0.3;" disabled' : ''}>↑</button>
+          <button class="reorder-photo-btn move-down" onclick="movePhoto(${i}, 1)" ${i === profileData.photos.length - 1 ? 'style="opacity:0.3;" disabled' : ''}>↓</button>
+          <button onclick="deletePhoto(${i})">×</button>
+        ` : ''}
       </div>
     `).join('');
+  }
+
+  function movePhoto(index, direction) {
+    const newIndex = index + direction;
+    if (newIndex < 0 || newIndex >= profileData.photos.length) return;
+    
+    const temp = profileData.photos[index];
+    profileData.photos[index] = profileData.photos[newIndex];
+    profileData.photos[newIndex] = temp;
+    
+    saveProfile();
+    renderPhotos();
   }
 
   function deletePhoto(index) {
@@ -1075,6 +1085,7 @@
     closeAddPhotoModal();
   }
 
+  // AMIGOS
   function renderFriends() {
     const container = document.getElementById('friends-container');
     if (!profileData.friends || profileData.friends.length === 0) {
@@ -1084,6 +1095,8 @@
     container.innerHTML = profileData.friends.map((f, i) => `
       <div class="friend-item">
         ${isEditor ? `
+          <button class="reorder-friend-btn move-up-friend" onclick="moveFriend(${i}, -1)" ${i === 0 ? 'style="opacity:0.3;" disabled' : ''}>↑</button>
+          <button class="reorder-friend-btn move-down-friend" onclick="moveFriend(${i}, 1)" ${i === profileData.friends.length - 1 ? 'style="opacity:0.3;" disabled' : ''}>↓</button>
           <button class="edit-btn" onclick="openAddFriendModal(${i})">✏️</button>
           <button onclick="deleteFriend(${i})">×</button>
         ` : ''}
@@ -1094,6 +1107,38 @@
         </div>
       </div>
     `).join('');
+  }
+
+  function moveFriend(index, direction) {
+    const newIndex = index + direction;
+    if (newIndex < 0 || newIndex >= profileData.friends.length) return;
+    
+    const temp = profileData.friends[index];
+    profileData.friends[index] = profileData.friends[newIndex];
+    profileData.friends[newIndex] = temp;
+    
+    profileData.posts.forEach(post => {
+      if (post.commentsData) {
+        swapFriendIndices(post.commentsData, index, newIndex);
+      }
+    });
+    
+    saveProfile();
+    renderFriends();
+    renderPosts();
+  }
+
+  function swapFriendIndices(comments, index1, index2) {
+    comments.forEach(comment => {
+      if (comment.friendIndex === index1) {
+        comment.friendIndex = index2;
+      } else if (comment.friendIndex === index2) {
+        comment.friendIndex = index1;
+      }
+      if (comment.replies) {
+        swapFriendIndices(comment.replies, index1, index2);
+      }
+    });
   }
 
   function deleteFriend(index) {
@@ -1163,6 +1208,57 @@
     });
   }
 
+  function openAddFriendModal(index) {
+    editingFriendIndex = index;
+    document.getElementById('add-friend-modal').style.display = 'flex';
+    
+    let friend = null;
+    if (index === -1) {
+      document.getElementById('friend-modal-title').textContent = 'Añadir Amigo';
+      tempFriendPic = null;
+      document.getElementById('friend-name').value = "";
+      document.getElementById('friend-verified').checked = false;
+    } else {
+      document.getElementById('friend-modal-title').textContent = 'Editar Amigo';
+      friend = profileData.friends[index];
+      document.getElementById('friend-name').value = friend.name;
+      tempFriendPic = friend.pic;
+      document.getElementById('friend-verified').checked = friend.verified || false;
+    }
+    
+    document.getElementById('friend-pic-name').textContent = tempFriendPic ? "Foto actual" : "Sin foto";
+  }
+
+  function closeAddFriendModal() {
+    document.getElementById('add-friend-modal').style.display = 'none';
+    editingFriendIndex = -1;
+  }
+
+  function saveFriend() {
+    const name = document.getElementById('friend-name').value.trim();
+    const verified = document.getElementById('friend-verified').checked;
+    if (!name) return alert("Escribe un nombre");
+    if (!profileData.friends) profileData.friends = [];
+    
+    const friendData = {
+      name,
+      pic: tempFriendPic || "https://via.placeholder.com/110?text=" + name[0],
+      verified: verified
+    };
+    
+    if (editingFriendIndex === -1) {
+      profileData.friends.push(friendData);
+    } else {
+      profileData.friends[editingFriendIndex] = friendData;
+    }
+    
+    saveProfile();
+    renderFriends();
+    renderPosts();
+    closeAddFriendModal();
+  }
+
+  // POSTS
   function renderPosts() {
     const { name, profilePic, badge, friends, characters, styles } = profileData;
 
@@ -1179,6 +1275,12 @@
 
       return `
       <div class="post">
+        ${isEditor ? `
+          <div class="reorder-buttons">
+            <button class="reorder-btn" onclick="movePost(${i}, -1)" ${i === 0 ? 'style="opacity:0.3;" disabled' : ''} title="Mover arriba">↑</button>
+            <button class="reorder-btn" onclick="movePost(${i}, 1)" ${i === profileData.posts.length - 1 ? 'style="opacity:0.3;" disabled' : ''} title="Mover abajo">↓</button>
+          </div>
+        ` : ''}
         <div class="post-header">
           <img src="${profilePic || 'https://via.placeholder.com/40'}" alt="">
           <div>
@@ -1186,7 +1288,7 @@
               ${name || 'Usuario'}
               ${badge ? `<img class="badge" src="${badge}" style="width:18px;height:18px;">` : ''}
             </div>
-            <div class="post-time" contenteditable="${isEditor}" oninput="updatePostTime(${i}, this.textContent)">${post.time || "Ahora mismo"} · 🌐</div>
+            <div class="post-time" contenteditable="${isEditor}" oninput="updatePostTime(${i}, this.textContent)">${post.time || "Ahora mismo"} · 🌍</div>
           </div>
           ${isEditor ? `
             <button style="margin-left:auto;background:none;border:none;font-size:24px;cursor:pointer;" onclick="deletePost(${i})">×</button>
@@ -1234,6 +1336,18 @@
         ` : '')}
       </div>
     `}).join('');
+  }
+
+  function movePost(index, direction) {
+    const newIndex = index + direction;
+    if (newIndex < 0 || newIndex >= profileData.posts.length) return;
+    
+    const temp = profileData.posts[index];
+    profileData.posts[index] = profileData.posts[newIndex];
+    profileData.posts[newIndex] = temp;
+    
+    saveProfile();
+    renderPosts();
   }
 
   function updatePostTime(postIndex, newTime) {
@@ -1304,6 +1418,29 @@
     }
   }
 
+  function createNewPost() {
+    const text = document.getElementById('new-post-text').value.trim();
+    if (!text && !tempPostImage) return alert('Escribe algo o añade una foto');
+    
+    if (!profileData.posts) profileData.posts = [];
+    
+    profileData.posts.unshift({
+      text: text.replace(/@([\wáéíóúñ]+)/gi, '<a href="#">@$1</a>'),
+      image: tempPostImage,
+      reactions: '',
+      comments: '',
+      shares: '',
+      reactionEmojis: '👍💖😆',
+      commentsData: [],
+      time: "Ahora mismo"
+    });
+    
+    tempPostImage = null;
+    document.getElementById('new-post-text').value = '';
+    saveProfile();
+    renderPosts();
+  }
+
   function openReactionsModal(postIndex) {
     if (!isEditor) return;
     currentPostForReactions = postIndex;
@@ -1329,6 +1466,7 @@
     closeReactionsModal();
   }
 
+  // COMENTARIOS
   function switchTab(tab) {
     currentTab = tab;
     if (tab === 'comments') {
@@ -1394,9 +1532,15 @@
         }
 
         const repliesHtml = comment.replies ? renderTree(comment.replies, currentPath) : '';
+        const canMoveUp = i > 0;
+        const canMoveDown = i < comments.length - 1;
 
         return `
           <div class="comment-tree-item ${path.length > 0 ? 'reply' : ''}">
+            <div class="comment-reorder-buttons">
+              <button class="reorder-btn" onclick="moveComment('${pathString}', -1)" ${!canMoveUp ? 'style="opacity:0.3;" disabled' : ''} title="Mover arriba">↑</button>
+              <button class="reorder-btn" onclick="moveComment('${pathString}', 1)" ${!canMoveDown ? 'style="opacity:0.3;" disabled' : ''} title="Mover abajo">↓</button>
+            </div>
             <div style="display:flex; align-items:center; gap:8px; margin-bottom:8px;">
               <img src="${commentPic}" style="width:32px; height:32px; border-radius:50%;" alt="">
               <strong>${commentAuthor}</strong>
@@ -1417,6 +1561,28 @@
 
     document.getElementById('comments-tree').innerHTML = renderTree(post.commentsData);
     document.getElementById('new-comment-text').value = '';
+  }
+
+  function moveComment(pathString, direction) {
+    const path = pathString.split('-').map(Number);
+    const post = profileData.posts[currentPostForComments];
+    
+    let current = post.commentsData;
+    for (let i = 0; i < path.length - 1; i++) {
+      current = current[path[i]].replies;
+    }
+    
+    const index = path[path.length - 1];
+    const newIndex = index + direction;
+    
+    if (newIndex < 0 || newIndex >= current.length) return;
+    
+    const temp = current[index];
+    current[index] = current[newIndex];
+    current[newIndex] = temp;
+    
+    saveProfile();
+    renderCommentsTree();
   }
 
   function getCommentByPath(comments, path) {
@@ -1735,93 +1901,15 @@
     renderPosts();
   }
 
-  function openAddFriendModal(index) {
-    editingFriendIndex = index;
-    document.getElementById('add-friend-modal').style.display = 'flex';
-    
-    let friend = null;
-    if (index === -1) {
-      document.getElementById('friend-modal-title').textContent = 'Añadir Amigo';
-      tempFriendPic = null;
-      document.getElementById('friend-name').value = "";
-      document.getElementById('friend-verified').checked = false;
-    } else {
-      document.getElementById('friend-modal-title').textContent = 'Editar Amigo';
-      friend = profileData.friends[index];
-      document.getElementById('friend-name').value = friend.name;
-      tempFriendPic = friend.pic;
-      document.getElementById('friend-verified').checked = friend.verified || false;
-    }
-    
-    document.getElementById('friend-pic-name').textContent = tempFriendPic ? "Foto actual" : "Sin foto";
-  }
-
-  function closeAddFriendModal() {
-    document.getElementById('add-friend-modal').style.display = 'none';
-    editingFriendIndex = -1;
-  }
-
-  function saveFriend() {
-    const name = document.getElementById('friend-name').value.trim();
-    const verified = document.getElementById('friend-verified').checked;
-    if (!name) return alert("Escribe un nombre");
-    if (!profileData.friends) profileData.friends = [];
-    
-    const friendData = {
-      name,
-      pic: tempFriendPic || "https://via.placeholder.com/110?text=" + name[0],
-      verified: verified
-    };
-    
-    if (editingFriendIndex === -1) {
-      profileData.friends.push(friendData);
-    } else {
-      profileData.friends[editingFriendIndex] = friendData;
-    }
-    
-    saveProfile();
-    renderFriends();
-    renderPosts();
-    closeAddFriendModal();
-  }
-
-  function createNewPost() {
-    const text = document.getElementById('new-post-text').value.trim();
-    if (!text && !tempPostImage) return alert('Escribe algo o añade una foto');
-    
-    if (!profileData.posts) profileData.posts = [];
-    
-    profileData.posts.unshift({
-      text: text.replace(/@([\wáéíóúñ]+)/gi, '<a href="#">@$1</a>'),
-      image: tempPostImage,
-      reactions: '',
-      comments: '',
-      shares: '',
-      reactionEmojis: '👍💖😆',
-      commentsData: [],
-      time: "Ahora mismo"
-    });
-    
-    tempPostImage = null;
-    document.getElementById('new-post-text').value = '';
-    saveProfile();
-    renderPosts();
-  }
-  
-  // IMAGEN UPLOAD MODAL CON RECORTE
-  
+  // IMAGEN UPLOAD MODAL
   function openImageUploadModal(target, postIndex = -1) {
     currentImageTarget = target;
     currentImageSourceType = 'file';
     currentImagePreviewData = null;
     currentImageCallback = null;
-    cropMode = false;
     
     document.getElementById('image-preview').style.display = 'none';
-    document.getElementById('crop-section').style.display = 'none';
     document.getElementById('simple-preview-section').style.display = 'block';
-    document.getElementById('enable-crop-btn').style.display = 'none';
-    document.getElementById('use-default-btn').style.display = 'none';
     
     document.getElementById('generic-file-input').value = '';
     document.getElementById('generic-url-input').value = '';
@@ -1889,11 +1977,7 @@
           document.getElementById('file-name-preview').textContent = 'Sin archivo seleccionado';
       }
       document.getElementById('image-preview').style.display = 'none';
-      document.getElementById('crop-section').style.display = 'none';
       document.getElementById('simple-preview-section').style.display = 'block';
-      document.getElementById('enable-crop-btn').style.display = 'none';
-      document.getElementById('use-default-btn').style.display = 'none';
-      cropMode = false;
   }
 
   function previewFile(e) {
@@ -1903,122 +1987,20 @@
       const reader = new FileReader();
       reader.onload = () => {
           currentImagePreviewData = reader.result;
-          cropOriginalImage = reader.result;
           document.getElementById('image-preview').src = currentImagePreviewData;
           document.getElementById('image-preview').style.display = 'block';
-          document.getElementById('enable-crop-btn').style.display = 'inline-block';
       };
       reader.readAsDataURL(file);
   }
 
   function previewUrl(e) {
       currentImagePreviewData = e.target.value.trim();
-      cropOriginalImage = currentImagePreviewData;
       document.getElementById('image-preview').src = currentImagePreviewData;
       document.getElementById('image-preview').style.display = currentImagePreviewData ? 'block' : 'none';
-      if (currentImagePreviewData) {
-          document.getElementById('enable-crop-btn').style.display = 'inline-block';
-      } else {
-          document.getElementById('enable-crop-btn').style.display = 'none';
-      }
-  }
-
-  function enableCropMode() {
-      if (!currentImagePreviewData) return alert('Primero selecciona una imagen');
-      
-      cropMode = true;
-      cropX = 0;
-      cropY = 0;
-      cropZoom = 100;
-      
-      document.getElementById('simple-preview-section').style.display = 'none';
-      document.getElementById('crop-section').style.display = 'block';
-      document.getElementById('enable-crop-btn').style.display = 'none';
-      document.getElementById('use-default-btn').style.display = 'inline-block';
-      
-      const cropCanvas = document.getElementById('crop-canvas');
-      cropCanvas.src = cropOriginalImage;
-      document.getElementById('zoom-slider').value = 100;
-      
-      cropCanvas.onload = () => {
-          resetCrop();
-      };
-      
-      setupCropHandlers();
-  }
-
-  function setupCropHandlers() {
-      const wrapper = document.getElementById('crop-canvas-wrapper');
-      const canvas = document.getElementById('crop-canvas');
-      
-      canvas.onmousedown = (e) => {
-          isDragging = true;
-          startDragX = e.clientX - cropX;
-          startDragY = e.clientY - cropY;
-          e.preventDefault();
-      };
-      
-      canvas.ontouchstart = (e) => {
-          isDragging = true;
-          const touch = e.touches[0];
-          startDragX = touch.clientX - cropX;
-          startDragY = touch.clientY - cropY;
-          e.preventDefault();
-      };
-      
-      document.onmousemove = (e) => {
-          if (!isDragging) return;
-          cropX = e.clientX - startDragX;
-          cropY = e.clientY - startDragY;
-          updateCropPosition();
-      };
-      
-      document.ontouchmove = (e) => {
-          if (!isDragging) return;
-          const touch = e.touches[0];
-          cropX = touch.clientX - startDragX;
-          cropY = touch.clientY - startDragY;
-          updateCropPosition();
-      };
-      
-      document.onmouseup = () => {
-          isDragging = false;
-      };
-      
-      document.ontouchend = () => {
-          isDragging = false;
-      };
-  }
-
-  function updateCropPosition() {
-      const canvas = document.getElementById('crop-canvas');
-      canvas.style.left = cropX + 'px';
-      canvas.style.top = cropY + 'px';
-  }
-
-  function updateZoom(value) {
-      cropZoom = parseInt(value);
-      const canvas = document.getElementById('crop-canvas');
-      canvas.style.width = cropZoom + '%';
-      canvas.style.height = 'auto';
-  }
-
-  function resetCrop() {
-      cropX = 0;
-      cropY = 0;
-      cropZoom = 100;
-      document.getElementById('zoom-slider').value = 100;
-      const canvas = document.getElementById('crop-canvas');
-      canvas.style.left = '0px';
-      canvas.style.top = '0px';
-      canvas.style.width = '100%';
-      canvas.style.height = 'auto';
   }
 
   function closeImageUploadModal() {
       document.getElementById('image-upload-modal').style.display = 'none';
-      cropMode = false;
-      isDragging = false;
   }
 
   function saveImage() {
@@ -2026,47 +2008,14 @@
           return alert(currentImageSourceType === 'file' ? 'Selecciona un archivo' : 'Pega un link/URL');
       }
       
-      if (cropMode) {
-          const wrapper = document.getElementById('crop-canvas-wrapper');
-          const canvas = document.getElementById('crop-canvas');
-          
-          const tempCanvas = document.createElement('canvas');
-          const ctx = tempCanvas.getContext('2d');
-          
-          const wrapperWidth = wrapper.offsetWidth;
-          const wrapperHeight = wrapper.offsetHeight;
-          
-          tempCanvas.width = wrapperWidth;
-          tempCanvas.height = wrapperHeight;
-          
-          const img = new Image();
-          img.onload = () => {
-              const scale = cropZoom / 100;
-              const scaledWidth = img.width * scale;
-              const scaledHeight = img.height * scale;
-              
-              ctx.drawImage(img, cropX, cropY, scaledWidth, scaledHeight);
-              
-              const croppedImage = tempCanvas.toDataURL('image/png');
-              
-              if (currentImageCallback) {
-                  currentImageCallback(croppedImage);
-              }
-              
-              closeImageUploadModal();
-          };
-          img.src = cropOriginalImage;
-      } else {
-          if (currentImageCallback) {
-              currentImageCallback(currentImagePreviewData);
-          }
-          
-          closeImageUploadModal();
+      if (currentImageCallback) {
+          currentImageCallback(currentImagePreviewData);
       }
+      
+      closeImageUploadModal();
   }
   
   // ESTILOS
-  
   const styleElements = [
     { id: 'fontFamilyProfile', name: 'Nombre de Perfil (Fuente)', type: 'font' },
     { id: 'fontSizeProfile', name: 'Nombre de Perfil (Tamaño)', type: 'size' },
@@ -2198,6 +2147,7 @@
       }
   }
 
+  // GUARDAR Y CARGAR PERFIL
   function saveProfile() {
     localStorage.setItem('fbProfile2025', JSON.stringify(profileData));
   }
