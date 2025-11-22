@@ -432,6 +432,7 @@
       width: 32px;
       height: 32px;
       border-radius: 50%;
+      object-fit: cover;
     }
     .comment-bubble {
       background: #f0f2f5;
@@ -488,6 +489,7 @@
       width: 40px;
       height: 40px;
       border-radius: 50%;
+      object-fit: cover;
     }
     .character-item.profile-character, .character-item.friend-character {
       border: 2px solid var(--fb-blue);
@@ -584,7 +586,7 @@
       <button class="edit-mode-only" onclick="toggleEditMode()">Salir del Editor</button>
     </div>
     <div class="header-right" style="margin-left: auto;">
-      <span class="version-info view-mode-only">Fakebook-Fabijose21-v4.0</span>
+      <span class="version-info view-mode-only">Fakebook-Fabijose21-v4.1</span>
       <button class="edit-mode-only" onclick="openStyleModal()">Personalizar Estilo</button>
       <button class="edit-mode-only reset-btn" onclick="resetProfile()">Resetear Perfil</button>
       <button class="edit-mode-only" onclick="exportProfile()">Exportar</button>
@@ -1542,7 +1544,7 @@
               <button class="reorder-btn" onclick="moveComment('${pathString}', 1)" ${!canMoveDown ? 'style="opacity:0.3;" disabled' : ''} title="Mover abajo">↓</button>
             </div>
             <div style="display:flex; align-items:center; gap:8px; margin-bottom:8px;">
-              <img src="${commentPic}" style="width:32px; height:32px; border-radius:50%;" alt="">
+              <img src="${commentPic}" style="width:32px; height:32px; border-radius:50%; object-fit:cover;" alt="">
               <strong>${commentAuthor}</strong>
               ${commentBadge && typeof commentBadge === 'string' && commentBadge.startsWith('http') ? `<img src="${commentBadge}" width="14" style="border-radius:50%;">` : (commentBadge ? commentBadge : '')}
               ${comment.hasHeart ? `<span>❤️</span>` : ''}
@@ -1688,7 +1690,7 @@
 
       return `
         <div class="character-item ${className}" onclick="selectCharacterForComment(${i})">
-          <img src="${char.pic}" alt="">
+          <img src="${char.pic}" alt="" style="object-fit:cover;">
           <div style="flex:1;">
             <strong>${char.name}</strong>
             ${badgeDisplay}
