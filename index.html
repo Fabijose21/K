@@ -293,9 +293,8 @@
       gap: 4px;
     }
     .friend-badge {
-      width: 8px;
-      height: px;
-      border-radius: 50%;
+      width: 14px;
+      height: 14px;
       flex-shrink: 0;
       display: inline-block;
       vertical-align: middle;
@@ -410,16 +409,6 @@
       margin-left: 40px;
       margin-top: 8px;
     }
-    .reply-link {
-      font-size: 12px;
-      color: #65676b;
-      cursor: pointer;
-      margin-top: 4px;
-      display: inline-block;
-    }
-    .reply-link:hover {
-      text-decoration: underline;
-    }
 
     .character-item {
       display: flex;
@@ -455,12 +444,47 @@
         margin-top:8px;
     }
 
+    .info-divider {
+      border: none;
+      border-top: 1px solid #e4e6eb;
+      margin: 12px 0;
+    }
+
     .style-control-group {
       border: 1px solid #ddd;
       padding: 12px;
       border-radius: 6px;
       margin-bottom: 12px;
       background: #f9f9f9;
+    }
+
+    .reaction-emojis-input {
+      width: 60px;
+      padding: 4px 8px;
+      border: 1px solid #ddd;
+      border-radius: 6px;
+      font-size: 16px;
+      text-align: center;
+      display: inline-block;
+    }
+
+    .comment-tree-item {
+      margin-bottom: 12px;
+      padding: 8px;
+      background: #f9f9f9;
+      border-radius: 8px;
+      border-left: 3px solid #ddd;
+    }
+
+    .comment-tree-item.reply {
+      margin-left: 20px;
+      border-left-color: var(--fb-blue);
+    }
+
+    .comment-controls {
+      display: flex;
+      gap: 8px;
+      margin-top: 8px;
     }
 
     @media print {
@@ -512,7 +536,7 @@
         </h1>
         <div id="followers-count" contenteditable="false"></div>
         <div class="edit-mode-only" style="margin-top:8px;">
-          <button onclick="chooseBadge('main')">Cambiar Insignia</button>
+          <button onclick="toggleBadge()">Alternar Verificado</button>
         </div>
       </div>
     </div>
@@ -523,7 +547,13 @@
       <div class="card">
         <h3>Información</h3>
         <div id="info-display" class="view-mode-only editable-info"></div>
-        <textarea id="info-text" class="edit-mode-only" placeholder="Añade información sobre ti..." style="width:100%; min-height:120px; border:1px solid #ddd; border-radius:8px; padding:12px; margin-top:8px; font-size:14px;"></textarea>
+        <textarea id="info-text" class="edit-mode-only" placeholder="Biografía o presentación..." style="width:100%; min-height:80px; border:1px solid #ddd; border-radius:8px; padding:12px; margin-top:8px; font-size:14px;"></textarea>
+        
+        <hr class="info-divider view-mode-only" id="info-divider-view">
+        <hr class="info-divider edit-mode-only" style="margin-top:8px;">
+        
+        <div id="info-details-display" class="view-mode-only editable-info"></div>
+        <textarea id="info-details-text" class="edit-mode-only" placeholder="Información adicional (estudios, trabajo, ciudad, etc.)..." style="width:100%; min-height:80px; border:1px solid #ddd; border-radius:8px; padding:12px; margin-top:8px; font-size:14px;"></textarea>
       </div>
 
       <div class="card">
@@ -623,7 +653,12 @@
     <h3 id="friend-modal-title">Añadir Amigo</h3>
     <p>Nombre: <input type="text" id="friend-name"></p>
     <p>Foto: <button onclick="openImageUploadModal('friend')">Cambiar Foto</button> <span id="friend-pic-name"></span></p>
-    <p>Insignia: <button onclick="chooseBadge('friend')">Elegir insignia</button> <span id="friend-badge-preview"></span></p>
+    <p>
+      <label style="display: flex; align-items: center; gap: 8px; cursor: pointer;">
+        <input type="checkbox" id="friend-verified" style="width: auto;">
+        <span>Verificado ☑️</span>
+      </label>
+    </p>
     <div style="margin-top:20px; text-align:right;">
       <button onclick="closeAddFriendModal()">Cancelar</button>
       <button style="background:var(--fb-blue);color:white;" onclick="saveFriend()">Guardar</button>
@@ -635,7 +670,6 @@
 <div class="modal" id="reactions-modal" style="display:none;">
   <div class="modal-content">
     <h3>Editar Reacciones</h3>
-    <p>Emojis de reacción (deja vacío para predeterminados 👍❤️😆): <input type="text" id="reaction-emojis" placeholder="👍❤️😆" maxlength="10"></p>
     <p>Total de reacciones: <input type="text" id="reaction-total" style="width:100%; padding:8px;"></p>
     <p>Comentarios: <input type="text" id="reaction-comments" style="width:100%; padding:8px;"></p>
     <p>Compartidos: <input type="text" id="reaction-shares" style="width:100%; padding:8px;"></p>
@@ -657,16 +691,16 @@
     </div>
 
     <div id="comments-tab-content">
-      <div id="comments-list"></div>
+      <div id="comments-tree"></div>
       <div style="margin-top:16px; border-top:1px solid #ddd; padding-top:16px;">
         <p><strong>Añadir comentario</strong></p>
         <p>
           <button onclick="openCharacterSelector()">Seleccionar personaje</button>
           <span id="selected-character-name" style="margin-left:8px; color:#65676b;"></span>
         </p>
-        <p id="reply-to-indicator" style="display:none; color:var(--fb-blue); font-size:12px; margin:8px 0;">
-          Respondiendo a: <span id="reply-to-name"></span>
-          <button onclick="cancelReply()" style="background:#e74c3c; color:white; font-size:11px; padding:2px 8px; margin-left:8px;">Cancelar</button>
+        <p id="parent-comment-indicator" style="display:none; color:var(--fb-blue); font-size:12px; margin:8px 0;">
+          Responder a: <span id="parent-comment-name"></span>
+          <button onclick="cancelParentSelection()" style="background:#e74c3c; color:white; font-size:11px; padding:2px 8px; margin-left:8px;">Cancelar</button>
         </p>
         <p>Comentario: <input type="text" id="new-comment-text"></p>
         <button onclick="addCommentToPost()" style="background:var(--fb-blue); color:white;">Añadir</button>
@@ -679,7 +713,12 @@
         <p><strong>Crear nuevo personaje</strong></p>
         <p>Nombre: <input type="text" id="new-char-name"></p>
         <p>Foto: <button onclick="openImageUploadModal('character')">Seleccionar foto</button> <span id="new-char-pic-name"></span></p>
-        <p>Insignia: <button onclick="chooseBadge('character')">Elegir insignia</button> <span id="char-badge-preview"></span></p>
+        <p>
+          <label style="display: flex; align-items: center; gap: 8px; cursor: pointer;">
+            <input type="checkbox" id="char-verified" style="width: auto;">
+            <span>Verificado</span>
+          </label>
+        </p>
         <button onclick="saveCharacter()" style="background:var(--fb-blue); color:white;">Guardar personaje</button>
       </div>
     </div>
@@ -705,16 +744,14 @@
   let isEditor = false;
   let tempPostImage = null;
   let tempFriendPic = null;
-  let tempFriendBadge = "";
   let tempCharPic = null;
-  let tempCharBadge = "";
   let tempPhotos = [];
   let currentPostForReactions = -1;
   let currentPostForComments = -1;
   let selectedCharacter = null;
   let currentTab = 'comments';
   let editingFriendIndex = -1;
-  let replyToCommentIndex = null;
+  let selectedParentCommentPath = null;
   
   let currentImageTarget = null;
   let currentImageSourceType = 'file';
@@ -751,6 +788,7 @@
     badge: "",
     followers: "",
     info: "",
+    infoDetails: "",
     photos: [],
     friends: [],
     posts: [],
@@ -787,6 +825,7 @@
       badge: "",
       followers: "",
       info: "",
+      infoDetails: "",
       photos: [],
       friends: [],
       posts: [],
@@ -800,6 +839,12 @@
     alert('Perfil reseteado correctamente');
   }
 
+  function toggleBadge() {
+    profileData.badge = profileData.badge ? "" : defaultBadges[0];
+    saveProfile();
+    renderAll();
+  }
+
   function renderAll() {
     const nameEl = document.getElementById('profile-name');
     nameEl.innerHTML = (profileData.name || '') + (profileData.badge ? `<img class="badge" src="${profileData.badge}" alt="✓">` : '');
@@ -808,8 +853,16 @@
     document.getElementById('cover-photo').src = profileData.cover || '';
     document.getElementById('followers-count').textContent = profileData.followers || '';
 
-    document.getElementById('info-display').innerHTML = profileData.info || '<span style="color:#65676b">Añade información sobre ti</span>';
-    document.getElementById('info-text').value = profileData.info;
+    const hasInfo = profileData.info && profileData.info.trim();
+    const hasDetails = profileData.infoDetails && profileData.infoDetails.trim();
+    
+    document.getElementById('info-display').innerHTML = hasInfo ? profileData.info : '<span style="color:#65676b">Añade información sobre ti</span>';
+    document.getElementById('info-text').value = profileData.info || "";
+    
+    document.getElementById('info-divider-view').style.display = (hasInfo || hasDetails) ? 'block' : 'none';
+    
+    document.getElementById('info-details-display').innerHTML = hasDetails ? profileData.infoDetails : '<span style="color:#65676b">Información adicional</span>';
+    document.getElementById('info-details-text').value = profileData.infoDetails || "";
     
     nameEl.oninput = () => { 
       const text = nameEl.textContent.trim();
@@ -829,33 +882,15 @@
       renderAll(); 
     };
 
+    document.getElementById('info-details-text').oninput = () => { 
+      profileData.infoDetails = document.getElementById('info-details-text').value; 
+      saveProfile(); 
+      renderAll(); 
+    };
+
     renderPhotos();
     renderFriends();
     renderPosts();
-  }
-
-  function chooseBadge(target) {
-    const choice = prompt(`Elige insignia (1) o pega URL propia:\n1. Verificado\nO pega tu URL:\n(Deja vacío para quitar)`, "");
-    let url = "";
-    if (choice === "1") {
-      url = defaultBadges[0];
-    } else if (choice && choice.startsWith('http')) {
-      url = choice;
-    } else if (choice === "0" || choice === "") {
-      url = "";
-    }
-
-    if (target === 'main') {
-      profileData.badge = url;
-      saveProfile();
-      renderAll();
-    } else if (target === 'friend') {
-      tempFriendBadge = url;
-      document.getElementById('friend-badge-preview').innerHTML = url ? `<img src="${url}" width="14" style="border-radius:50%;">` : "Ninguna";
-    } else if (target === 'character') {
-      tempCharBadge = url;
-      document.getElementById('char-badge-preview').innerHTML = url ? `<img src="${url}" width="14" style="border-radius:50%;">` : "Ninguna";
-    }
   }
 
   function renderPhotos() {
@@ -976,7 +1011,7 @@
         <img src="${f.pic || 'https://via.placeholder.com/110?text=Amigo'}">
         <div class="friend-name">
           ${f.name}
-          ${f.badge ? `<img class="friend-badge" src="${f.badge}" alt="✓">` : ''}
+          ${f.verified ? `<span class="friend-badge">☑️</span>` : ''}
         </div>
       </div>
     `).join('');
@@ -988,31 +1023,25 @@
       
       profileData.posts.forEach(post => {
         if (post.commentsData) {
-          post.commentsData.forEach(comment => {
-            if (comment.friendIndex === index) {
-              if (!profileData.characters) profileData.characters = [];
-              profileData.characters.push({
-                name: friend.name,
-                pic: friend.pic,
-                badge: friend.badge,
-                fromFriend: true
-              });
-              
-              comment.characterIndex = profileData.characters.length - 1;
-              delete comment.friendIndex;
-              delete comment.isFriend;
-            }
-          });
+          const needsConversion = hasCommentsFromFriend(post.commentsData, index);
+          
+          if (needsConversion) {
+            if (!profileData.characters) profileData.characters = [];
+            profileData.characters.push({
+              name: friend.name,
+              pic: friend.pic,
+              verified: friend.verified,
+              fromFriend: true
+            });
+            
+            convertFriendToCharacter(post.commentsData, index, profileData.characters.length - 1);
+          }
         }
       });
       
       profileData.posts.forEach(post => {
         if (post.commentsData) {
-          post.commentsData.forEach(comment => {
-            if (comment.friendIndex > index) {
-              comment.friendIndex -= 1;
-            }
-          });
+          decrementFriendIndices(post.commentsData, index);
         }
       });
       
@@ -1021,6 +1050,38 @@
       renderFriends();
       renderPosts();
     }
+  }
+
+  function hasCommentsFromFriend(comments, friendIndex) {
+    for (let comment of comments) {
+      if (comment.friendIndex === friendIndex) return true;
+      if (comment.replies && hasCommentsFromFriend(comment.replies, friendIndex)) return true;
+    }
+    return false;
+  }
+
+  function convertFriendToCharacter(comments, friendIndex, newCharIndex) {
+    comments.forEach(comment => {
+      if (comment.friendIndex === friendIndex) {
+        comment.characterIndex = newCharIndex;
+        delete comment.friendIndex;
+        delete comment.isFriend;
+      }
+      if (comment.replies) {
+        convertFriendToCharacter(comment.replies, friendIndex, newCharIndex);
+      }
+    });
+  }
+
+  function decrementFriendIndices(comments, deletedIndex) {
+    comments.forEach(comment => {
+      if (comment.friendIndex !== undefined && comment.friendIndex > deletedIndex) {
+        comment.friendIndex -= 1;
+      }
+      if (comment.replies) {
+        decrementFriendIndices(comment.replies, deletedIndex);
+      }
+    });
   }
 
   function renderPosts() {
@@ -1032,8 +1093,7 @@
       const hasShares = post.shares && post.shares.trim() !== '';
       const showBar = hasReactions || hasComments || hasShares;
       
-      // Usar emojis personalizados si existen, sino usar los predeterminados
-      const reactionEmojis = (post.reactionEmojis && post.reactionEmojis.trim() !== '') ? post.reactionEmojis : '👍❤️😆';
+      const reactionEmojis = (post.reactionEmojis && post.reactionEmojis.trim() !== '') ? post.reactionEmojis : '👍💖😆';
       const emojisArray = Array.from(reactionEmojis).slice(0, 3);
       
       const commentsHtml = renderCommentsRecursive(post.commentsData || [], name, profilePic, badge, friends, characters, styles, i);
@@ -1047,13 +1107,13 @@
               ${name || 'Usuario'}
               ${badge ? `<img class="badge" src="${badge}" style="width:18px;height:18px;">` : ''}
             </div>
-            <div class="post-time" contenteditable="${isEditor}" oninput="profileData.posts[${i}].time=this.textContent;saveProfile()">${post.time || "Ahora mismo"} · 🌐</div>
+            <div class="post-time" contenteditable="${isEditor}" oninput="updatePostTime(${i}, this.textContent)">${post.time || "Ahora mismo"} · 🌍</div>
           </div>
           ${isEditor ? `
             <button style="margin-left:auto;background:none;border:none;font-size:24px;cursor:pointer;" onclick="deletePost(${i})">×</button>
           ` : ''}
         </div>
-        <div class="post-content" contenteditable="${isEditor}" oninput="profileData.posts[${i}].text=this.innerHTML;saveProfile()">${post.text}</div>
+        <div class="post-content" contenteditable="${isEditor}" oninput="updatePostContent(${i}, this.innerHTML)">${post.text}</div>
         ${post.image ? `<img src="${post.image}" class="post-image" onclick="${isEditor ? `openPostImageModal(${i})` : ''}">` : ''}
 
         ${showBar ? `
@@ -1066,10 +1126,15 @@
               <span class="reaction-count">${post.reactions}</span>
             ` : ''}
           </div>
-          <div class="comments-shares" onclick="${isEditor ? `openReactionsModal(${i})` : ''}" style="cursor:${isEditor ? 'pointer' : 'default'};">
-            ${hasComments ? `${post.comments} comentario${post.comments === '1' ? '' : 's'}` : ''}
-            ${hasComments && hasShares ? ' · ' : ''}
-            ${hasShares ? `${post.shares} compartido${post.shares === '1' ? '' : 's'}` : ''}
+          <div style="display: flex; align-items: center; gap: 8px;">
+            ${isEditor ? `
+              <input type="text" class="reaction-emojis-input" value="${reactionEmojis}" oninput="updateReactionEmojis(${i}, this.value)" placeholder="👍❤️😆" maxlength="10">
+            ` : ''}
+            <div class="comments-shares" onclick="${isEditor ? `openReactionsModal(${i})` : ''}" style="cursor:${isEditor ? 'pointer' : 'default'};">
+              ${hasComments ? `${post.comments} comentario${post.comments === '1' ? '' : 's'}` : ''}
+              ${hasComments && hasShares ? ' · ' : ''}
+              ${hasShares ? `${post.shares} compartido${post.shares === '1' ? '' : 's'}` : ''}
+            </div>
           </div>
         </div>
         ` : (isEditor ? `
@@ -1092,6 +1157,21 @@
     `}).join('');
   }
 
+  function updatePostTime(postIndex, newTime) {
+    profileData.posts[postIndex].time = newTime;
+    saveProfile();
+  }
+
+  function updatePostContent(postIndex, newContent) {
+    profileData.posts[postIndex].text = newContent;
+    saveProfile();
+  }
+
+  function updateReactionEmojis(postIndex, newEmojis) {
+    profileData.posts[postIndex].reactionEmojis = newEmojis.trim();
+    saveProfile();
+  }
+
   function renderCommentsRecursive(comments, name, profilePic, badge, friends, characters, styles, postIndex, depth = 0) {
     return comments.map((comment, commentIndex) => {
       let commentAuthor = 'Desconocido';
@@ -1106,12 +1186,12 @@
         const friend = friends[comment.friendIndex];
         commentAuthor = friend.name;
         commentPic = friend.pic;
-        commentBadge = friend.badge;
+        commentBadge = friend.verified ? '☑️' : '';
       } else if (comment.characterIndex !== undefined && characters[comment.characterIndex]) {
         const character = characters[comment.characterIndex];
         commentAuthor = character.name;
         commentPic = character.pic;
-        commentBadge = character.badge;
+        commentBadge = character.verified ? (character.badge || defaultBadges[0]) : '';
       } else {
         commentAuthor = comment.author;
         commentPic = comment.pic;
@@ -1126,12 +1206,11 @@
           <div class="comment-bubble">
             <div class="comment-author">
               ${commentAuthor}
-              ${commentBadge ? `<img class="comment-badge" src="${commentBadge}" alt="✓">` : ''}
+              ${commentBadge && typeof commentBadge === 'string' && commentBadge.startsWith('http') ? `<img class="comment-badge" src="${commentBadge}" alt="✓">` : (commentBadge ? commentBadge : '')}
             </div>
             <div class="comment-text">${comment.text}</div>
             ${comment.hasHeart ? `<div class="comment-heart">❤️</div>` : ''}
           </div>
-          ${isEditor ? `<span class="reply-link" onclick="setReplyTo(${commentIndex}, '${commentAuthor.replace(/'/g, "\\'")}', ${depth})">Responder</span>` : ''}
         </div>
         ${repliesHtml}
       `;
@@ -1150,7 +1229,6 @@
     if (!isEditor) return;
     currentPostForReactions = postIndex;
     const post = profileData.posts[postIndex];
-    document.getElementById('reaction-emojis').value = post.reactionEmojis || '';
     document.getElementById('reaction-total').value = post.reactions || '';
     document.getElementById('reaction-comments').value = post.comments || '';
     document.getElementById('reaction-shares').value = post.shares || '';
@@ -1164,7 +1242,6 @@
   function saveReactions() {
     if (currentPostForReactions === -1) return;
     const post = profileData.posts[currentPostForReactions];
-    post.reactionEmojis = document.getElementById('reaction-emojis').value.trim();
     post.reactions = document.getElementById('reaction-total').value.trim();
     post.comments = document.getElementById('reaction-comments').value.trim();
     post.shares = document.getElementById('reaction-shares').value.trim();
@@ -1200,31 +1277,23 @@
     if (!post.commentsData) post.commentsData = [];
     
     selectedCharacter = null;
-    replyToCommentIndex = null;
+    selectedParentCommentPath = null;
     document.getElementById('selected-character-name').textContent = '';
-    document.getElementById('reply-to-indicator').style.display = 'none';
+    document.getElementById('parent-comment-indicator').style.display = 'none';
     switchTab('comments');
-    renderCommentsInModal();
+    renderCommentsTree();
     document.getElementById('comments-modal').style.display = 'flex';
   }
 
-  function setReplyTo(commentIndex, commentAuthor, depth) {
-    replyToCommentIndex = commentIndex;
-    document.getElementById('reply-to-indicator').style.display = 'block';
-    document.getElementById('reply-to-name').textContent = commentAuthor;
-  }
-
-  function cancelReply() {
-    replyToCommentIndex = null;
-    document.getElementById('reply-to-indicator').style.display = 'none';
-  }
-
-  function renderCommentsInModal() {
+  function renderCommentsTree() {
     const post = profileData.posts[currentPostForComments];
-    const { friends, characters, name, profilePic, badge, styles } = profileData;
+    const { friends, characters, name, profilePic, badge } = profileData;
 
-    const renderCommentList = (comments, depth = 0) => {
+    function renderTree(comments, path = []) {
       return comments.map((comment, i) => {
+        const currentPath = [...path, i];
+        const pathString = currentPath.join('-');
+        
         let commentAuthor = 'Desconocido';
         let commentPic = 'https://via.placeholder.com/32';
         let commentBadge = '';
@@ -1237,52 +1306,86 @@
           const friend = friends[comment.friendIndex];
           commentAuthor = friend.name;
           commentPic = friend.pic;
-          commentBadge = friend.badge;
+          commentBadge = friend.verified ? '☑️' : '';
         } else if (comment.characterIndex !== undefined && characters[comment.characterIndex]) {
           const character = characters[comment.characterIndex];
           commentAuthor = character.name;
           commentPic = character.pic;
-          commentBadge = character.badge;
-        } else {
-          commentAuthor = comment.author || 'Desconocido';
-          commentPic = comment.pic || 'https://via.placeholder.com/32';
-          commentBadge = comment.badge || '';
+          commentBadge = character.verified ? (character.badge || defaultBadges[0]) : '';
         }
 
-        const repliesHtml = comment.replies ? renderCommentList(comment.replies, depth + 1) : '';
+        const repliesHtml = comment.replies ? renderTree(comment.replies, currentPath) : '';
 
         return `
-          <div style="display:flex; justify-content:space-between; align-items:start; padding:8px; background:#f0f2f5; border-radius:8px; margin-bottom:8px; margin-left:${depth * 20}px;">
-            <div style="flex:1;">
-              <div style="display:flex; align-items:center; gap:8px; margin-bottom:4px;">
-                <img src="${commentPic}" style="width:24px; height:24px; border-radius:50%;" alt="">
-                <strong>${commentAuthor}</strong>
-                ${commentBadge ? `<img src="${commentBadge}" width="12" style="border-radius:50%;">` : ''}
-                ${comment.hasHeart ? `<span>❤️</span>` : ''}
-              </div>
-              <div style="padding-left:32px;">${comment.text}</div>
+          <div class="comment-tree-item ${path.length > 0 ? 'reply' : ''}">
+            <div style="display:flex; align-items:center; gap:8px; margin-bottom:8px;">
+              <img src="${commentPic}" style="width:32px; height:32px; border-radius:50%;" alt="">
+              <strong>${commentAuthor}</strong>
+              ${commentBadge && typeof commentBadge === 'string' && commentBadge.startsWith('http') ? `<img src="${commentBadge}" width="14" style="border-radius:50%;">` : (commentBadge ? commentBadge : '')}
+              ${comment.hasHeart ? `<span>❤️</span>` : ''}
             </div>
-            <div style="display:flex; gap:4px;">
-              <button onclick="toggleCommentHeart(${i})" style="background:${comment.hasHeart ? '#e74c3c' : '#ddd'}; color:white; border:none; padding:4px 8px; border-radius:4px; cursor:pointer; font-size:11px;">❤️</button>
-              <button onclick="removeComment(${i})" style="background:red; color:white; border:none; padding:4px 8px; border-radius:4px; cursor:pointer; flex-shrink:0;">×</button>
+            <div style="padding-left:40px; margin-bottom:8px;">${comment.text}</div>
+            <div class="comment-controls" style="padding-left:40px;">
+              <button onclick="toggleCommentHeart('${pathString}')" style="background:${comment.hasHeart ? '#e74c3c' : '#ddd'}; color:white; border:none; padding:4px 8px; border-radius:4px; cursor:pointer; font-size:11px;">❤️</button>
+              <button onclick="setParentComment('${pathString}', '${commentAuthor.replace(/'/g, "\\'")}', ${currentPath.length})" style="background:var(--fb-blue); color:white; border:none; padding:4px 8px; border-radius:4px; cursor:pointer; font-size:11px;">Responder</button>
+              <button onclick="removeComment('${pathString}')" style="background:red; color:white; border:none; padding:4px 8px; border-radius:4px; cursor:pointer; font-size:11px;">Eliminar</button>
             </div>
+            ${repliesHtml}
           </div>
-          ${repliesHtml}
         `;
       }).join('');
-    };
+    }
 
-    document.getElementById('comments-list').innerHTML = renderCommentList(post.commentsData);
+    document.getElementById('comments-tree').innerHTML = renderTree(post.commentsData);
     document.getElementById('new-comment-text').value = '';
   }
 
-  function toggleCommentHeart(commentIndex) {
-    const post = profileData.posts[currentPostForComments];
-    if (post.commentsData[commentIndex]) {
-      post.commentsData[commentIndex].hasHeart = !post.commentsData[commentIndex].hasHeart;
-      saveProfile();
-      renderCommentsInModal();
+  function getCommentByPath(comments, path) {
+    let current = comments;
+    for (let i = 0; i < path.length; i++) {
+      if (!current[path[i]]) return null;
+      if (i === path.length - 1) return current[path[i]];
+      current = current[path[i]].replies || [];
     }
+    return null;
+  }
+
+  function toggleCommentHeart(pathString) {
+    const path = pathString.split('-').map(Number);
+    const post = profileData.posts[currentPostForComments];
+    const comment = getCommentByPath(post.commentsData, path);
+    if (comment) {
+      comment.hasHeart = !comment.hasHeart;
+      saveProfile();
+      renderCommentsTree();
+    }
+  }
+
+  function setParentComment(pathString, authorName, depth) {
+    selectedParentCommentPath = pathString;
+    document.getElementById('parent-comment-indicator').style.display = 'block';
+    document.getElementById('parent-comment-name').textContent = authorName;
+  }
+
+  function cancelParentSelection() {
+    selectedParentCommentPath = null;
+    document.getElementById('parent-comment-indicator').style.display = 'none';
+  }
+
+  function removeComment(pathString) {
+    if (!confirm('¿Eliminar este comentario y todas sus respuestas?')) return;
+    
+    const path = pathString.split('-').map(Number);
+    const post = profileData.posts[currentPostForComments];
+    
+    let current = post.commentsData;
+    for (let i = 0; i < path.length - 1; i++) {
+      current = current[path[i]].replies;
+    }
+    
+    current.splice(path[path.length - 1], 1);
+    saveProfile();
+    renderCommentsTree();
   }
 
   function openCharacterSelector() {
@@ -1301,7 +1404,7 @@
     const friendChars = (profileData.friends || []).map((f, idx) => ({
       name: f.name,
       pic: f.pic,
-      badge: f.badge,
+      verified: f.verified,
       type: 'friend',
       index: idx
     }));
@@ -1309,7 +1412,7 @@
     const customChars = (profileData.characters || []).map((c, idx) => ({
       name: c.name,
       pic: c.pic,
-      badge: c.badge,
+      verified: c.verified,
       type: 'character',
       index: idx
     }));
@@ -1329,12 +1432,21 @@
         infoText = '<span style="color:#65676b; font-size:12px; margin-left:8px;">(Personaje - antes amigo)</span>';
       }
 
+      let badgeDisplay = '';
+      if (char.type === 'profile' && char.badge) {
+        badgeDisplay = `<img src="${char.badge}" width="12" style="border-radius:50%; margin-left:4px; vertical-align:middle;">`;
+      } else if (char.type === 'friend' && char.verified) {
+        badgeDisplay = '<span style="margin-left:4px;">☑️</span>';
+      } else if (char.type === 'character' && char.verified) {
+        badgeDisplay = `<img src="${defaultBadges[0]}" width="12" style="border-radius:50%; margin-left:4px; vertical-align:middle;">`;
+      }
+
       return `
         <div class="character-item ${className}" onclick="selectCharacterForComment(${i})">
           <img src="${char.pic}" alt="">
           <div style="flex:1;">
             <strong>${char.name}</strong>
-            ${char.badge ? `<img src="${char.badge}" width="12" style="border-radius:50%; margin-left:4px; vertical-align:middle;">` : ''}
+            ${badgeDisplay}
             ${infoText}
           </div>
         </div>
@@ -1353,7 +1465,7 @@
     const friendChars = (profileData.friends || []).map((f, idx) => ({
       name: f.name,
       pic: f.pic,
-      badge: f.badge,
+      verified: f.verified,
       type: 'friend',
       index: idx
     }));
@@ -1361,7 +1473,7 @@
     const customChars = (profileData.characters || []).map((c, idx) => ({
       name: c.name,
       pic: c.pic,
-      badge: c.badge,
+      verified: c.verified,
       type: 'character',
       index: idx
     }));
@@ -1395,34 +1507,29 @@
       replies: []
     };
     
-    if (replyToCommentIndex !== null) {
-      if (!post.commentsData[replyToCommentIndex].replies) {
-        post.commentsData[replyToCommentIndex].replies = [];
+    if (selectedParentCommentPath) {
+      const path = selectedParentCommentPath.split('-').map(Number);
+      const parentComment = getCommentByPath(post.commentsData, path);
+      if (parentComment) {
+        if (!parentComment.replies) parentComment.replies = [];
+        parentComment.replies.push(commentData);
       }
-      post.commentsData[replyToCommentIndex].replies.push(commentData);
-      cancelReply();
+      cancelParentSelection();
     } else {
       post.commentsData.push(commentData);
     }
     
     saveProfile();
-    renderCommentsInModal();
+    renderCommentsTree();
     selectedCharacter = null;
     document.getElementById('selected-character-name').textContent = '';
     document.getElementById('new-comment-text').value = '';
   }
 
-  function removeComment(commentIndex) {
-    const post = profileData.posts[currentPostForComments];
-    post.commentsData.splice(commentIndex, 1);
-    saveProfile();
-    renderCommentsInModal();
-  }
-
   function renderCharactersList() {
     const { friends, characters, name, profilePic, badge } = profileData;
 
-    constprofileChar = {
+    const profileChar = {
       name: name || 'Mi Perfil',
       pic: profilePic || 'https://via.placeholder.com/40',
       badge: badge,
@@ -1432,7 +1539,7 @@
     const friendChars = (friends || []).map(f => ({
       name: f.name,
       pic: f.pic,
-      badge: f.badge,
+      verified: f.verified,
       type: 'friend'
     }));
 
@@ -1460,7 +1567,7 @@
             <img src="${char.pic}" alt="">
             <div style="flex:1;">
               <strong>${char.name}</strong>
-              ${char.badge ? `<img src="${char.badge}" width="14" style="border-radius:50%; margin-left:4px; vertical-align:middle;">` : ''}
+              ${char.verified ? '<span style="margin-left:4px;">☑️</span>' : ''}
               <div style="color:#65676b; font-size:12px;">Amigo (se actualiza automáticamente - edita en la sección Amigos)</div>
             </div>
           </div>
@@ -1473,7 +1580,7 @@
             <img src="${char.pic}" alt="">
             <div style="flex:1;">
               <strong>${char.name}</strong>
-              ${char.badge ? `<img src="${char.badge}" width="14" style="border-radius:50%; margin-left:4px; vertical-align:middle;">` : ''}
+              ${char.verified ? `<img src="${defaultBadges[0]}" width="14" style="border-radius:50%; margin-left:4px; vertical-align:middle;">` : ''}
               ${char.fromFriend ? '<div style="color:#65676b; font-size:12px;">(Personaje independiente - antes era amigo)</div>' : ''}
             </div>
             <button onclick="deleteCharacter(${realIndex})" style="background:red; color:white; border:none; padding:6px 12px; border-radius:6px; cursor:pointer;">Eliminar</button>
@@ -1484,10 +1591,12 @@
     
     tempCharPic = null;
     document.getElementById('new-char-pic-name').textContent = 'Sin foto';
+    document.getElementById('char-verified').checked = false;
   }
 
   function saveCharacter() {
     const name = document.getElementById('new-char-name').value.trim();
+    const verified = document.getElementById('char-verified').checked;
     
     if (!name) return alert("Escribe un nombre para el personaje");
     if (!tempCharPic) return alert("Añade una foto (archivo o URL) para el personaje");
@@ -1497,15 +1606,14 @@
     profileData.characters.push({
       name: name,
       pic: tempCharPic,
-      badge: tempCharBadge,
+      verified: verified,
       fromFriend: false
     });
     
     document.getElementById('new-char-name').value = '';
     tempCharPic = null;
-    tempCharBadge = '';
     document.getElementById('new-char-pic-name').textContent = 'Sin foto';
-    document.getElementById('char-badge-preview').innerHTML = '';
+    document.getElementById('char-verified').checked = false;
     
     saveProfile();
     renderCharactersList();
@@ -1516,16 +1624,7 @@
     if (confirm('¿Eliminar este personaje? Todos sus comentarios quedarán como "Desconocido".')) {
       profileData.posts.forEach(post => {
         if (post.commentsData) {
-          post.commentsData = post.commentsData.filter(comment => {
-            if (comment.characterIndex !== undefined) {
-              if (comment.characterIndex === index) {
-                return false; 
-              } else if (comment.characterIndex > index) {
-                comment.characterIndex -= 1;
-              }
-            }
-            return true;
-          });
+          removeCharacterFromComments(post.commentsData, index);
         }
       });
       
@@ -1533,6 +1632,22 @@
       saveProfile();
       renderCharactersList();
       renderPosts();
+    }
+  }
+
+  function removeCharacterFromComments(comments, charIndex) {
+    for (let i = comments.length - 1; i >= 0; i--) {
+      const comment = comments[i];
+      if (comment.characterIndex !== undefined) {
+        if (comment.characterIndex === charIndex) {
+          comments.splice(i, 1);
+        } else if (comment.characterIndex > charIndex) {
+          comment.characterIndex -= 1;
+        }
+      }
+      if (comment.replies) {
+        removeCharacterFromComments(comment.replies, charIndex);
+      }
     }
   }
 
@@ -1549,18 +1664,17 @@
     if (index === -1) {
       document.getElementById('friend-modal-title').textContent = 'Añadir Amigo';
       tempFriendPic = null;
-      tempFriendBadge = "";
       document.getElementById('friend-name').value = "";
+      document.getElementById('friend-verified').checked = false;
     } else {
       document.getElementById('friend-modal-title').textContent = 'Editar Amigo';
       friend = profileData.friends[index];
       document.getElementById('friend-name').value = friend.name;
       tempFriendPic = friend.pic;
-      tempFriendBadge = friend.badge || "";
+      document.getElementById('friend-verified').checked = friend.verified || false;
     }
     
     document.getElementById('friend-pic-name').textContent = tempFriendPic ? "Foto actual" : "Sin foto";
-    document.getElementById('friend-badge-preview').innerHTML = tempFriendBadge ? `<img src="${tempFriendBadge}" width="14" style="border-radius:50%;">` : "Ninguna";
   }
 
   function closeAddFriendModal() {
@@ -1570,13 +1684,14 @@
 
   function saveFriend() {
     const name = document.getElementById('friend-name').value.trim();
+    const verified = document.getElementById('friend-verified').checked;
     if (!name) return alert("Escribe un nombre");
     if (!profileData.friends) profileData.friends = [];
     
     const friendData = {
       name,
       pic: tempFriendPic || "https://via.placeholder.com/110?text=" + name[0],
-      badge: tempFriendBadge
+      verified: verified
     };
     
     if (editingFriendIndex === -1) {
@@ -1603,7 +1718,7 @@
       reactions: '',
       comments: '',
       shares: '',
-      reactionEmojis: '',
+      reactionEmojis: '👍💖😆',
       commentsData: [],
       time: "Ahora mismo"
     });
@@ -1875,19 +1990,28 @@
             loadedData.styles = profileData.styles;
         }
 
+        if (loadedData.friends) {
+          loadedData.friends.forEach(friend => {
+            if (friend.badge && !friend.verified) {
+              friend.verified = true;
+            }
+            delete friend.badge;
+          });
+        }
+
+        if (loadedData.characters) {
+          loadedData.characters.forEach(char => {
+            if (char.badge && !char.verified) {
+              char.verified = true;
+            }
+          });
+        }
+
         if (loadedData.posts) {
             loadedData.posts.forEach(post => {
-                if (!post.reactionEmojis) post.reactionEmojis = '';
+                if (!post.reactionEmojis) post.reactionEmojis = '👍💖😆';
                 if (post.commentsData) {
-                    post.commentsData.forEach(comment => {
-                        if (!comment.hasHeart) comment.hasHeart = false;
-                        if (!comment.replies) comment.replies = [];
-                        if (comment.isProfile || comment.friendIndex !== undefined || comment.characterIndex !== undefined) {
-                            delete comment.author;
-                            delete comment.pic;
-                            delete comment.badge;
-                        }
-                    });
+                    processCommentsForCompatibility(post.commentsData);
                 }
             });
         }
@@ -1899,6 +2023,7 @@
           badge: loadedData.badge || "",
           followers: loadedData.followers || "",
           info: loadedData.info || "",
+          infoDetails: loadedData.infoDetails || "",
           photos: loadedData.photos || [],
           friends: loadedData.friends || [],
           posts: loadedData.posts || [],
@@ -1910,6 +2035,21 @@
         console.error('Error al cargar perfil:', e);
       }
     }
+  }
+
+  function processCommentsForCompatibility(comments) {
+    comments.forEach(comment => {
+      if (!comment.hasHeart) comment.hasHeart = false;
+      if (!comment.replies) comment.replies = [];
+      if (comment.isProfile || comment.friendIndex !== undefined || comment.characterIndex !== undefined) {
+        delete comment.author;
+        delete comment.pic;
+        delete comment.badge;
+      }
+      if (comment.replies) {
+        processCommentsForCompatibility(comment.replies);
+      }
+    });
   }
 
   function exportProfile() {
@@ -1938,19 +2078,28 @@
             importedData.styles = profileData.styles;
         }
 
+        if (importedData.friends) {
+          importedData.friends.forEach(friend => {
+            if (friend.badge && !friend.verified) {
+              friend.verified = true;
+            }
+            delete friend.badge;
+          });
+        }
+
+        if (importedData.characters) {
+          importedData.characters.forEach(char => {
+            if (char.badge && !char.verified) {
+              char.verified = true;
+            }
+          });
+        }
+
         if (importedData.posts) {
             importedData.posts.forEach(post => {
-                if (!post.reactionEmojis) post.reactionEmojis = '';
+                if (!post.reactionEmojis) post.reactionEmojis = '👍💖😆';
                 if (post.commentsData) {
-                    post.commentsData.forEach(comment => {
-                        if (!comment.hasHeart) comment.hasHeart = false;
-                        if (!comment.replies) comment.replies = [];
-                        if (comment.isProfile || comment.friendIndex !== undefined || comment.characterIndex !== undefined) {
-                            delete comment.author;
-                            delete comment.pic;
-                            delete comment.badge;
-                        }
-                    });
+                    processCommentsForCompatibility(post.commentsData);
                 }
             });
         }
@@ -1962,6 +2111,7 @@
           badge: importedData.badge || "",
           followers: importedData.followers || "",
           info: importedData.info || "",
+          infoDetails: importedData.infoDetails || "",
           photos: importedData.photos || [],
           friends: importedData.friends || [],
           posts: importedData.posts || [],
