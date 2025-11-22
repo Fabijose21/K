@@ -11,6 +11,20 @@
       --fb-gray: #f0f2f5;
       --text: #1c1e21;
       --light-text: #65676b;
+      --font-family-profile: 'Segoe UI', Arial, sans-serif;
+      --font-size-profile: 32px;
+      --font-family-followers: 'Segoe UI', Arial, sans-serif;
+      --font-size-followers: 15px;
+      --font-family-info: 'Segoe UI', Arial, sans-serif;
+      --font-size-info: 14px;
+      --font-family-post-text: 'Segoe UI', Arial, sans-serif;
+      --font-size-post-text: 16px;
+      --font-family-post-time: 'Segoe UI', Arial, sans-serif;
+      --font-size-post-time: 13px;
+      --font-family-comment: 'Segoe UI', Arial, sans-serif;
+      --font-size-comment: 13px;
+      --font-family-friend: 'Segoe UI', Arial, sans-serif;
+      --font-size-friend: 13px;
     }
     * { margin:0; padding:0; box-sizing:border-box; font-family: 'Segoe UI', Arial, sans-serif; }
     body { background: #e4e6eb; color: var(--text); line-height: 1.34; }
@@ -30,15 +44,25 @@
       align-items: center;
     }
     .logo { font-size: 28px; font-weight: 900; color: var(--fb-blue); }
-    .header-right button, .header-right label {
+    .header-right {
+      display: flex;
+      gap: 8px;
+      flex-wrap: wrap;
+    }
+    .header-left {
+      display: flex;
+      gap: 8px;
+      flex-wrap: wrap;
+    }
+    .header-right button, .header-right label, .header-left button, .header-left label {
       background: var(--fb-blue);
       color: white;
       border: none;
       padding: 8px 16px;
       border-radius: 20px;
       cursor: pointer;
-      margin-left: 8px;
       font-weight: 600;
+      white-space: nowrap;
     }
     .header-right .reset-btn {
       background: #e74c3c;
@@ -82,7 +106,8 @@
       flex: 1;
     }
     #profile-name {
-      font-size: 32px;
+      font-size: var(--font-size-profile);
+      font-family: var(--font-family-profile);
       font-weight: 700;
       display: flex;
       align-items: center;
@@ -102,7 +127,8 @@
       vertical-align: middle;
     }
     #followers-count {
-      font-size: 15px;
+      font-size: var(--font-size-followers);
+      font-family: var(--font-family-followers);
       color: #65676b;
       display: inline-block;
       padding: 4px 8px;
@@ -187,9 +213,18 @@
       align-items: center;
       gap: 6px;
     }
-    .post-time { font-size: 13px; color: #65676b; }
+    .post-time { 
+      font-size: var(--font-size-post-time); 
+      font-family: var(--font-family-post-time);
+      color: #65676b; 
+    }
 
-    .post-content { padding: 0 16px 12px; white-space: pre-wrap; }
+    .post-content { 
+      padding: 0 16px 12px; 
+      white-space: pre-wrap;
+      font-size: var(--font-size-post-text);
+      font-family: var(--font-family-post-text);
+    }
     .post-content a { color: var(--fb-blue); font-weight: 600; }
     .post-image { width: 100%; max-height: 600px; object-fit: cover; cursor: pointer; }
 
@@ -251,16 +286,19 @@
     .friend-name {
       margin-top: 4px;
       font-weight: 600;
-      font-size: 13px;
+      font-size: var(--font-size-friend);
+      font-family: var(--font-family-friend);
       display: flex;
       align-items: center;
       gap: 4px;
     }
     .friend-badge {
-      width: 10px;
-      height: 10px;
+      width: 8px;
+      height: px;
       border-radius: 50%;
       flex-shrink: 0;
+      display: inline-block;
+      vertical-align: middle;
     }
     .friend-item button {
       position: absolute;
@@ -291,6 +329,7 @@
       background: white; padding: 24px; border-radius: 12px; width: 500px; max-width: 90%;
       max-height: 80vh;
       overflow-y: auto;
+      z-index: 1001;
     }
     .modal-content h3 {
       margin-bottom: 16px;
@@ -298,7 +337,7 @@
     .modal-content p {
       margin-bottom: 12px;
     }
-    .modal-content input[type="text"], .modal-content input[type="url"] {
+    .modal-content input[type="text"], .modal-content input[type="url"], .modal-content input[type="number"], .modal-content select, .modal-content textarea {
       width: 100%;
       padding: 8px;
       border: 1px solid #ddd;
@@ -314,7 +353,7 @@
       margin-left: 8px;
     }
 
-    /* Comentarios opcionales */
+    /* Comentarios */
     .comments-section {
       border-top: 1px solid #e4e6eb;
       padding: 12px 16px;
@@ -327,6 +366,7 @@
       display: flex;
       gap: 8px;
       margin-bottom: 12px;
+      position: relative;
     }
     .comment-item img {
       width: 32px;
@@ -338,6 +378,7 @@
       padding: 8px 12px;
       border-radius: 18px;
       flex: 1;
+      position: relative;
     }
     .comment-author {
       font-weight: 600;
@@ -348,7 +389,36 @@
       gap: 4px;
     }
     .comment-text {
-      font-size: 13px;
+      font-size: var(--font-size-comment);
+      font-family: var(--font-family-comment);
+    }
+    .comment-heart {
+      position: absolute;
+      bottom: -8px;
+      right: 8px;
+      background: white;
+      border-radius: 50%;
+      padding: 2px 4px;
+      font-size: 12px;
+      box-shadow: 0 1px 3px rgba(0,0,0,0.2);
+      cursor: pointer;
+    }
+    .comment-heart:hover {
+      transform: scale(1.1);
+    }
+    .comment-reply {
+      margin-left: 40px;
+      margin-top: 8px;
+    }
+    .reply-link {
+      font-size: 12px;
+      color: #65676b;
+      cursor: pointer;
+      margin-top: 4px;
+      display: inline-block;
+    }
+    .reply-link:hover {
+      text-decoration: underline;
     }
 
     .character-item {
@@ -376,6 +446,22 @@
     .character-item.profile-character:hover, .character-item.friend-character:hover {
       background: #f0f2f5;
     }
+    
+    .editable-info {
+        font-size: var(--font-size-info); 
+        font-family: var(--font-family-info); 
+        white-space: pre-line; 
+        line-height:1.6; 
+        margin-top:8px;
+    }
+
+    .style-control-group {
+      border: 1px solid #ddd;
+      padding: 12px;
+      border-radius: 6px;
+      margin-bottom: 12px;
+      background: #f9f9f9;
+    }
 
     @media print {
       .header, .edit-mode-only, .no-print { display: none !important; }
@@ -387,30 +473,39 @@
       .profile-section { flex-direction: column; align-items: center; text-align: center; }
       #profile-pic { width: 120px; height: 120px; margin-top: -60px; }
       .profile-info { margin-left: 0; margin-top: 12px; }
+      .header { flex-direction: column; gap: 8px; }
+      .header-left, .header-right { width: 100%; justify-content: center; }
     }
   </style>
 </head>
 <body>
 
 <div class="header">
-  <div class="logo">Fakebook</div>
-  <div class="header-right">
-    <button class="view-mode-only" onclick="window.print()">Imprimir Perfil</button>
-    <button class="view-mode-only" onclick="toggleEditMode()">Editar Perfil</button>
-    <button class="edit-mode-only" onclick="toggleEditMode()">Salir del Editor</button>
-    <button class="edit-mode-only reset-btn" onclick="resetProfile()">Resetear Perfil</button>
-    <button class="edit-mode-only" onclick="exportProfile()">Exportar</button>
-    <label class="edit-mode-only" style="cursor:pointer;">
-      Importar <input type="file" id="import-file" style="display:none" accept=".json" onchange="importProfile(event)">
-    </label>
+  <div style="display: flex; gap: 16px; align-items: center; flex-wrap: wrap; width: 100%;">
+    <div class="logo">Fakebook</div>
+    <div class="header-left">
+      <button class="view-mode-only" onclick="window.print()">Imprimir Perfil</button>
+      <button class="view-mode-only" onclick="toggleEditMode()">Editar Perfil</button>
+      <button class="edit-mode-only" onclick="toggleEditMode()">Salir del Editor</button>
+    </div>
+    <div class="header-right" style="margin-left: auto;">
+      <button class="edit-mode-only" onclick="openStyleModal()">Personalizar Estilo</button>
+      <button class="edit-mode-only reset-btn" onclick="resetProfile()">Resetear Perfil</button>
+      <button class="edit-mode-only" onclick="exportProfile()">Exportar</button>
+      <label class="edit-mode-only" style="cursor:pointer;">
+        Importar <input type="file" id="import-file" style="display:none" accept=".json" onchange="importProfile(event)">
+      </label>
+    </div>
   </div>
 </div>
 
 <div class="container">
   <div class="cover-container">
     <img id="cover-photo" src="" alt="Cover" style="background:#ccc;" />
+    <button class="edit-mode-only" style="position:absolute; bottom:16px; right:16px; background:rgba(0,0,0,0.6); color:white; border:none; padding:8px 16px; border-radius:6px; cursor:pointer;" onclick="openImageUploadModal('cover')">Cambiar Portada</button>
     <div class="profile-section">
       <img id="profile-pic" src="" alt="Perfil" style="background:#e4e6eb;" />
+      <button class="edit-mode-only" style="position:absolute; top:-40px; left:120px; background:rgba(0,0,0,0.6); color:white; border:none; padding:8px; border-radius:50%; width:40px; height:40px; cursor:pointer; line-height:24px;" onclick="openImageUploadModal('profilePic')">📷</button>
       <div class="profile-info">
         <h1 id="profile-name" contenteditable="false">
           <button class="invisible-lift-btn">.</button>
@@ -424,11 +519,10 @@
   </div>
 
   <div class="main-grid" style="display:grid;grid-template-columns:360px 1fr;gap:20px;margin-top:20px;">
-    <!-- Izquierda -->
     <div>
       <div class="card">
         <h3>Información</h3>
-        <div id="info-display" class="view-mode-only" style="white-space: pre-line; line-height:1.6; margin-top:8px;"></div>
+        <div id="info-display" class="view-mode-only editable-info"></div>
         <textarea id="info-text" class="edit-mode-only" placeholder="Añade información sobre ti..." style="width:100%; min-height:120px; border:1px solid #ddd; border-radius:8px; padding:12px; margin-top:8px; font-size:14px;"></textarea>
       </div>
 
@@ -449,12 +543,11 @@
       </div>
     </div>
 
-    <!-- Derecha -->
     <div>
       <div class="create-post edit-mode-only card">
         <textarea id="new-post-text" placeholder="¿En qué estás pensando?" rows="4" style="width:100%; border:1px solid #ddd; border-radius:8px; padding:12px; font-size:14px;"></textarea>
         <div style="margin-top:10px;display:flex;gap:10px;">
-          <button onclick="addPostImage()">Añadir foto</button>
+          <button onclick="openPostImageModal('new')">Añadir foto</button>
           <button onclick="createNewPost()">Publicar</button>
         </div>
       </div>
@@ -464,15 +557,59 @@
   </div>
 </div>
 
-<!-- Modal Añadir Foto -->
+<!-- Modal Personalizar Estilo -->
+<div class="modal" id="style-modal" style="display:none;">
+  <div class="modal-content">
+    <h3>Personalizar Estilo</h3>
+    <p>Puedes usar fuentes comunes (Arial, 'Times New Roman', Courier New, etc.) o fuentes instaladas en tu sistema.</p>
+    
+    <div id="style-controls"></div>
+    
+    <div style="margin-top:20px; text-align:right; border-top: 1px solid #ddd; padding-top: 16px;">
+      <button onclick="resetAllStyles()" style="background:#e74c3c; color:white;">Restablecer Todos</button>
+      <button onclick="closeStyleModal()">Cerrar</button>
+      <button style="background:var(--fb-blue);color:white;" onclick="applyStyles()">Aplicar Estilos</button>
+    </div>
+  </div>
+</div>
+
+<!-- Modal Imagen Upload -->
+<div class="modal" id="image-upload-modal" style="display:none; z-index: 2000;">
+  <div class="modal-content" style="z-index: 2001;">
+    <h3 id="image-upload-title">Cambiar Imagen</h3>
+    <div style="margin-bottom:12px;">
+      <button onclick="switchImageInput('file')" id="btn-file-input">Subir Archivo</button>
+      <button onclick="switchImageInput('url')" id="btn-url-input">Usar Link/URL</button>
+    </div>
+    
+    <div id="file-input-section">
+      <p>
+        <button onclick="document.getElementById('generic-file-input').click()">Seleccionar Archivo</button>
+        <input type="file" id="generic-file-input" style="display:none;" accept="image/*" onchange="previewFile(event)">
+        <span id="file-name-preview">Sin archivo seleccionado</span>
+      </p>
+    </div>
+    
+    <div id="url-input-section" style="display:none;">
+      <p>Link/URL: <input type="url" id="generic-url-input" placeholder="https://..." oninput="previewUrl(event)"></p>
+    </div>
+    
+    <div style="text-align:center; margin-top:16px;">
+        <img id="image-preview" src="" style="max-width:100%; max-height:200px; display:none; border:1px solid #ddd; border-radius:4px;">
+    </div>
+
+    <div style="margin-top:20px; text-align:right;">
+      <button onclick="closeImageUploadModal()">Cancelar</button>
+      <button style="background:var(--fb-blue);color:white;" onclick="saveImage()">Guardar Imagen</button>
+    </div>
+  </div>
+</div>
+
+<!-- Modal Añadir Fotos -->
 <div class="modal" id="add-photo-modal" style="display:none;">
   <div class="modal-content">
-    <h3>Añadir Fotos</h3>
-    <p>
-      <button onclick="document.getElementById('photo-input').click()">Seleccionar fotos</button>
-      <input type="file" id="photo-input" style="display:none;" accept="image/*" multiple>
-      <span id="photo-name">Sin fotos seleccionadas</span>
-    </p>
+    <h3>Añadir Fotos a la Galería</h3>
+    <div id="photo-add-options"></div>
     <div style="margin-top:20px; text-align:right;">
       <button onclick="closeAddPhotoModal()">Cancelar</button>
       <button style="background:var(--fb-blue);color:white;" onclick="savePhotos()">Añadir</button>
@@ -485,10 +622,7 @@
   <div class="modal-content">
     <h3 id="friend-modal-title">Añadir Amigo</h3>
     <p>Nombre: <input type="text" id="friend-name"></p>
-    <p>Foto: <button onclick="document.getElementById('friend-pic-input').click()">Seleccionar foto</button>
-      <input type="file" id="friend-pic-input" style="display:none;" accept="image/*">
-      <span id="friend-pic-name">Sin foto</span>
-    </p>
+    <p>Foto: <button onclick="openImageUploadModal('friend')">Cambiar Foto</button> <span id="friend-pic-name"></span></p>
     <p>Insignia: <button onclick="chooseBadge('friend')">Elegir insignia</button> <span id="friend-badge-preview"></span></p>
     <div style="margin-top:20px; text-align:right;">
       <button onclick="closeAddFriendModal()">Cancelar</button>
@@ -501,6 +635,7 @@
 <div class="modal" id="reactions-modal" style="display:none;">
   <div class="modal-content">
     <h3>Editar Reacciones</h3>
+    <p>Emojis de reacción (deja vacío para predeterminados 👍❤️😆): <input type="text" id="reaction-emojis" placeholder="👍❤️😆" maxlength="10"></p>
     <p>Total de reacciones: <input type="text" id="reaction-total" style="width:100%; padding:8px;"></p>
     <p>Comentarios: <input type="text" id="reaction-comments" style="width:100%; padding:8px;"></p>
     <p>Compartidos: <input type="text" id="reaction-shares" style="width:100%; padding:8px;"></p>
@@ -516,13 +651,11 @@
   <div class="modal-content">
     <h3>Gestionar Comentarios</h3>
     
-    <!-- Tabs -->
     <div style="display:flex; gap:8px; border-bottom:2px solid #e4e6eb; margin-bottom:16px;">
       <button id="tab-comments" onclick="switchTab('comments')" style="padding:8px 16px; border:none; background:none; border-bottom:3px solid var(--fb-blue); font-weight:600; cursor:pointer;">Comentarios</button>
       <button id="tab-characters" onclick="switchTab('characters')" style="padding:8px 16px; border:none; background:none; border-bottom:3px solid transparent; cursor:pointer;">Personajes</button>
     </div>
 
-    <!-- Tab Comentarios -->
     <div id="comments-tab-content">
       <div id="comments-list"></div>
       <div style="margin-top:16px; border-top:1px solid #ddd; padding-top:16px;">
@@ -531,18 +664,21 @@
           <button onclick="openCharacterSelector()">Seleccionar personaje</button>
           <span id="selected-character-name" style="margin-left:8px; color:#65676b;"></span>
         </p>
+        <p id="reply-to-indicator" style="display:none; color:var(--fb-blue); font-size:12px; margin:8px 0;">
+          Respondiendo a: <span id="reply-to-name"></span>
+          <button onclick="cancelReply()" style="background:#e74c3c; color:white; font-size:11px; padding:2px 8px; margin-left:8px;">Cancelar</button>
+        </p>
         <p>Comentario: <input type="text" id="new-comment-text"></p>
         <button onclick="addCommentToPost()" style="background:var(--fb-blue); color:white;">Añadir</button>
       </div>
     </div>
 
-    <!-- Tab Personajes -->
     <div id="characters-tab-content" style="display:none;">
       <div id="characters-list"></div>
       <div style="margin-top:16px; border-top:1px solid #ddd; padding-top:16px;">
         <p><strong>Crear nuevo personaje</strong></p>
         <p>Nombre: <input type="text" id="new-char-name"></p>
-        <p>Foto (URL): <input type="url" id="new-char-pic" placeholder="https://..."></p>
+        <p>Foto: <button onclick="openImageUploadModal('character')">Seleccionar foto</button> <span id="new-char-pic-name"></span></p>
         <p>Insignia: <button onclick="chooseBadge('character')">Elegir insignia</button> <span id="char-badge-preview"></span></p>
         <button onclick="saveCharacter()" style="background:var(--fb-blue); color:white;">Guardar personaje</button>
       </div>
@@ -570,17 +706,43 @@
   let tempPostImage = null;
   let tempFriendPic = null;
   let tempFriendBadge = "";
+  let tempCharPic = null;
+  let tempCharBadge = "";
   let tempPhotos = [];
   let currentPostForReactions = -1;
   let currentPostForComments = -1;
   let selectedCharacter = null;
-  let tempCharBadge = "";
   let currentTab = 'comments';
   let editingFriendIndex = -1;
+  let replyToCommentIndex = null;
+  
+  let currentImageTarget = null;
+  let currentImageSourceType = 'file';
+  let currentImagePreviewData = null;
+  let currentImageCallback = null;
+  
+  const FONT_OPTIONS = ['Arial', 'Verdana', 'Tahoma', 'Trebuchet MS', 'Times New Roman', 'Georgia', 'Courier New', 'Monospace', 'Segoe UI'];
 
   const defaultBadges = [
-    "https://cdn-icons-png.freepik.com/512/11820/11820285.png", // Verificado
+    "https://cdn-icons-png.freepik.com/512/11820/11820285.png",
   ];
+
+  const DEFAULT_STYLES = {
+    fontFamilyProfile: 'Segoe UI, Arial, sans-serif',
+    fontSizeProfile: '32px',
+    fontFamilyFollowers: 'Segoe UI, Arial, sans-serif',
+    fontSizeFollowers: '15px',
+    fontFamilyInfo: 'Segoe UI, Arial, sans-serif',
+    fontSizeInfo: '14px',
+    fontFamilyPostText: 'Segoe UI, Arial, sans-serif',
+    fontSizePostText: '16px',
+    fontFamilyPostTime: 'Segoe UI, Arial, sans-serif',
+    fontSizePostTime: '13px',
+    fontFamilyComment: 'Segoe UI, Arial, sans-serif',
+    fontSizeComment: '13px',
+    fontFamilyFriend: 'Segoe UI, Arial, sans-serif',
+    fontSizeFriend: '13px',
+  };
 
   let profileData = {
     name: "",
@@ -592,11 +754,13 @@
     photos: [],
     friends: [],
     posts: [],
-    characters: []
+    characters: [],
+    styles: {...DEFAULT_STYLES}
   };
 
   window.onload = () => {
     loadProfile();
+    applyStylesToCSS();
     renderAll();
   };
 
@@ -626,9 +790,11 @@
       photos: [],
       friends: [],
       posts: [],
-      characters: []
+      characters: [],
+      styles: {...DEFAULT_STYLES}
     };
     
+    applyStylesToCSS();
     saveProfile();
     renderAll();
     alert('Perfil reseteado correctamente');
@@ -644,15 +810,12 @@
 
     document.getElementById('info-display').innerHTML = profileData.info || '<span style="color:#65676b">Añade información sobre ti</span>';
     document.getElementById('info-text').value = profileData.info;
-
-    document.getElementById('cover-photo').onclick = isEditor ? () => changeImage(src => { profileData.cover = src; saveProfile(); renderAll(); }) : null;
-    document.getElementById('profile-pic').onclick = isEditor ? () => changeImage(src => { profileData.profilePic = src; saveProfile(); renderAll(); }) : null;
     
     nameEl.oninput = () => { 
       const text = nameEl.textContent.trim();
       profileData.name = text;
       saveProfile();
-      updateCommentsWithProfileChanges();
+      renderPosts();
     };
     
     document.getElementById('followers-count').oninput = () => {
@@ -671,35 +834,6 @@
     renderPosts();
   }
 
-  function updateCommentsWithProfileChanges() {
-    // Actualizar comentarios cuando cambia el perfil o amigos
-    profileData.posts.forEach(post => {
-      if (post.commentsData) {
-        post.commentsData.forEach(comment => {
-          // Actualizar si es el perfil principal
-          if (comment.isProfile) {
-            comment.author = profileData.name || 'Mi Perfil';
-            comment.pic = profileData.profilePic || 'https://via.placeholder.com/32';
-            comment.badge = profileData.badge;
-          }
-          
-          // Actualizar si es un amigo
-          if (comment.friendIndex !== undefined && comment.friendIndex >= 0) {
-            const friend = profileData.friends[comment.friendIndex];
-            if (friend) {
-              comment.author = friend.name;
-              comment.pic = friend.pic;
-              comment.badge = friend.badge;
-            }
-          }
-        });
-      }
-    });
-    
-    saveProfile();
-    renderPosts();
-  }
-
   function chooseBadge(target) {
     const choice = prompt(`Elige insignia (1) o pega URL propia:\n1. Verificado\nO pega tu URL:\n(Deja vacío para quitar)`, "");
     let url = "";
@@ -715,7 +849,6 @@
       profileData.badge = url;
       saveProfile();
       renderAll();
-      updateCommentsWithProfileChanges();
     } else if (target === 'friend') {
       tempFriendBadge = url;
       document.getElementById('friend-badge-preview').innerHTML = url ? `<img src="${url}" width="14" style="border-radius:50%;">` : "Ninguna";
@@ -749,29 +882,68 @@
   function openAddPhotoModal() {
     document.getElementById('add-photo-modal').style.display = 'flex';
     tempPhotos = [];
-    document.getElementById('photo-name').textContent = "Sin fotos seleccionadas";
+    document.getElementById('photo-add-options').innerHTML = `
+      <div style="margin-bottom:12px;">
+        <button onclick="addPhotoInput('file')">Subir Archivo</button>
+        <button onclick="addPhotoInput('url')">Usar Link/URL</button>
+      </div>
+      <div id="dynamic-photo-inputs"></div>
+    `;
+    addPhotoInput('file');
+  }
+
+  function addPhotoInput(type) {
+    const container = document.getElementById('dynamic-photo-inputs');
+    const index = container.children.length;
     
-    const input = document.getElementById('photo-input');
-    input.value = '';
-    input.onchange = function(e) {
-      const files = Array.from(e.target.files);
-      if (files.length > 0) {
-        tempPhotos = [];
-        let loaded = 0;
-        
-        files.forEach(file => {
-          const reader = new FileReader();
-          reader.onload = () => {
-            tempPhotos.push(reader.result);
-            loaded++;
-            if (loaded === files.length) {
-              document.getElementById('photo-name').textContent = `${files.length} foto${files.length > 1 ? 's' : ''} seleccionada${files.length > 1 ? 's' : ''}`;
-            }
-          };
-          reader.readAsDataURL(file);
-        });
-      }
+    if (type === 'file') {
+      const inputId = `photo-file-${index}`;
+      container.innerHTML += `
+        <p style="border: 1px solid #ddd; padding:8px; border-radius:6px; margin-bottom:8px;">
+          <button onclick="document.getElementById('${inputId}').click()">Seleccionar Foto (Archivo)</button>
+          <input type="file" id="${inputId}" style="display:none;" accept="image/*" onchange="handlePhotoFile(event, ${index})">
+          <span id="photo-name-${index}" style="margin-left:8px;">Sin archivo seleccionado</span>
+          <button onclick="removePhotoInput(${index})" style="background:red; color:white; float:right;">×</button>
+        </p>
+      `;
+    } else {
+      const inputId = `photo-url-${index}`;
+      container.innerHTML += `
+        <p style="border: 1px solid #ddd; padding:8px; border-radius:6px; margin-bottom:8px;">
+          Link/URL: <input type="url" id="${inputId}" placeholder="https://..." oninput="handlePhotoUrl(event, ${index})">
+          <button onclick="removePhotoInput(${index})" style="background:red; color:white; margin-top:8px;">×</button>
+        </p>
+      `;
+    }
+    tempPhotos[index] = null;
+  }
+
+  function handlePhotoFile(e, index) {
+    const file = e.target.files[0];
+    if (!file) {
+      tempPhotos[index] = null;
+      document.getElementById(`photo-name-${index}`).textContent = "Sin archivo seleccionado";
+      return;
+    }
+    const reader = new FileReader();
+    reader.onload = () => {
+      tempPhotos[index] = reader.result;
+      document.getElementById(`photo-name-${index}`).textContent = file.name;
     };
+    reader.readAsDataURL(file);
+  }
+
+  function handlePhotoUrl(e, index) {
+    tempPhotos[index] = e.target.value.trim();
+  }
+
+  function removePhotoInput(index) {
+    const container = document.getElementById('dynamic-photo-inputs');
+    const element = container.children[index];
+    if (element) {
+      element.remove();
+      tempPhotos[index] = 'DELETED';
+    }
   }
 
   function closeAddPhotoModal() {
@@ -779,9 +951,11 @@
   }
 
   function savePhotos() {
-    if (tempPhotos.length === 0) return alert("Selecciona al menos una foto");
+    const validPhotos = tempPhotos.filter(p => p && p !== 'DELETED');
+    if (validPhotos.length === 0) return alert("Añade al menos una foto (archivo o URL)");
+    
     if (!profileData.photos) profileData.photos = [];
-    profileData.photos.push(...tempPhotos);
+    profileData.photos.push(...validPhotos);
     saveProfile();
     renderPhotos();
     closeAddPhotoModal();
@@ -809,40 +983,69 @@
   }
 
   function deleteFriend(index) {
-    if (confirm('¿Eliminar este amigo?')) {
+    if (confirm('¿Eliminar este amigo? Si este amigo tenía comentarios, serán convertidos a un personaje para mantenerlos.')) {
       const friend = profileData.friends[index];
       
-      // Convertir amigo a personaje editable
-      if (!profileData.characters) profileData.characters = [];
-      profileData.characters.push({
-        name: friend.name,
-        pic: friend.pic,
-        badge: friend.badge,
-        fromFriend: true
+      profileData.posts.forEach(post => {
+        if (post.commentsData) {
+          post.commentsData.forEach(comment => {
+            if (comment.friendIndex === index) {
+              if (!profileData.characters) profileData.characters = [];
+              profileData.characters.push({
+                name: friend.name,
+                pic: friend.pic,
+                badge: friend.badge,
+                fromFriend: true
+              });
+              
+              comment.characterIndex = profileData.characters.length - 1;
+              delete comment.friendIndex;
+              delete comment.isFriend;
+            }
+          });
+        }
+      });
+      
+      profileData.posts.forEach(post => {
+        if (post.commentsData) {
+          post.commentsData.forEach(comment => {
+            if (comment.friendIndex > index) {
+              comment.friendIndex -= 1;
+            }
+          });
+        }
       });
       
       profileData.friends.splice(index, 1);
       saveProfile();
       renderFriends();
-      updateCommentsWithProfileChanges();
+      renderPosts();
     }
   }
 
   function renderPosts() {
+    const { name, profilePic, badge, friends, characters, styles } = profileData;
+
     document.getElementById('posts-container').innerHTML = profileData.posts.map((post, i) => {
       const hasReactions = post.reactions && post.reactions.trim() !== '';
       const hasComments = post.comments && post.comments.trim() !== '';
       const hasShares = post.shares && post.shares.trim() !== '';
       const showBar = hasReactions || hasComments || hasShares;
+      
+      // Usar emojis personalizados si existen, sino usar los predeterminados
+      const reactionEmojis = (post.reactionEmojis && post.reactionEmojis.trim() !== '') ? post.reactionEmojis : '👍❤️😆';
+      const emojisArray = Array.from(reactionEmojis).slice(0, 3);
+      
+      const commentsHtml = renderCommentsRecursive(post.commentsData || [], name, profilePic, badge, friends, characters, styles, i);
 
       return `
       <div class="post">
         <div class="post-header">
-          <img src="${profileData.profilePic || 'https://via.placeholder.com/40'}" alt="">
+          <img src="${profilePic || 'https://via.placeholder.com/40'}" alt="">
           <div>
             <div class="post-author">
-              ${profileData.name || 'Usuario'}
-              ${profileData.badge ? `<img class="badge" src="${profileData.badge}" style="width:18px;height:18px;">` : ''}
+              ${name || 'Usuario'}
+              ${badge ? `<img class="badge" src="${badge}" style="width:18px;height:18px;">` : ''}
             </div>
             <div class="post-time" contenteditable="${isEditor}" oninput="profileData.posts[${i}].time=this.textContent;saveProfile()">${post.time || "Ahora mismo"} · 🌐</div>
           </div>
@@ -851,16 +1054,14 @@
           ` : ''}
         </div>
         <div class="post-content" contenteditable="${isEditor}" oninput="profileData.posts[${i}].text=this.innerHTML;saveProfile()">${post.text}</div>
-        ${post.image ? `<img src="${post.image}" class="post-image" onclick="${isEditor ? `changePostImage(${i})` : ''}">` : ''}
+        ${post.image ? `<img src="${post.image}" class="post-image" onclick="${isEditor ? `openPostImageModal(${i})` : ''}">` : ''}
 
         ${showBar ? `
         <div class="reactions-bar">
           <div class="reaction-summary" onclick="${isEditor ? `openReactionsModal(${i})` : ''}" style="cursor:${isEditor ? 'pointer' : 'default'};">
             ${hasReactions ? `
               <div class="reaction-icons">
-                <span>👍</span>
-                <span>❤️</span>
-                <span>😆</span>
+                ${emojisArray.map(emoji => `<span>${emoji}</span>`).join('')}
               </div>
               <span class="reaction-count">${post.reactions}</span>
             ` : ''}
@@ -877,20 +1078,9 @@
         </div>
         ` : '')}
 
-        ${post.commentsData && post.commentsData.length > 0 ? `
+        ${commentsHtml.length > 0 ? `
         <div class="comments-section visible">
-          ${post.commentsData.map((comment, ci) => `
-            <div class="comment-item">
-              <img src="${comment.pic || 'https://via.placeholder.com/32'}" alt="">
-              <div class="comment-bubble">
-                <div class="comment-author">
-                  ${comment.author}
-                  ${comment.badge ? `<img class="comment-badge" src="${comment.badge}" alt="✓">` : ''}
-                </div>
-                <div class="comment-text">${comment.text}</div>
-              </div>
-            </div>
-          `).join('')}
+          ${commentsHtml}
           ${isEditor ? `<button onclick="openCommentsModal(${i})" style="margin-top:8px; font-size:13px; background:var(--fb-gray); padding:6px 12px; border-radius:6px; border:none; cursor:pointer;">Editar comentarios</button>` : ''}
         </div>
         ` : (isEditor ? `
@@ -900,6 +1090,52 @@
         ` : '')}
       </div>
     `}).join('');
+  }
+
+  function renderCommentsRecursive(comments, name, profilePic, badge, friends, characters, styles, postIndex, depth = 0) {
+    return comments.map((comment, commentIndex) => {
+      let commentAuthor = 'Desconocido';
+      let commentPic = 'https://via.placeholder.com/32';
+      let commentBadge = '';
+      
+      if (comment.isProfile) {
+        commentAuthor = name || 'Mi Perfil';
+        commentPic = profilePic || 'https://via.placeholder.com/32';
+        commentBadge = badge;
+      } else if (comment.friendIndex !== undefined && friends[comment.friendIndex]) {
+        const friend = friends[comment.friendIndex];
+        commentAuthor = friend.name;
+        commentPic = friend.pic;
+        commentBadge = friend.badge;
+      } else if (comment.characterIndex !== undefined && characters[comment.characterIndex]) {
+        const character = characters[comment.characterIndex];
+        commentAuthor = character.name;
+        commentPic = character.pic;
+        commentBadge = character.badge;
+      } else {
+        commentAuthor = comment.author;
+        commentPic = comment.pic;
+        commentBadge = comment.badge;
+      }
+
+      const repliesHtml = comment.replies ? renderCommentsRecursive(comment.replies, name, profilePic, badge, friends, characters, styles, postIndex, depth + 1) : '';
+
+      return `
+        <div class="comment-item" style="margin-left: ${depth * 40}px;">
+          <img src="${commentPic}" alt="">
+          <div class="comment-bubble">
+            <div class="comment-author">
+              ${commentAuthor}
+              ${commentBadge ? `<img class="comment-badge" src="${commentBadge}" alt="✓">` : ''}
+            </div>
+            <div class="comment-text">${comment.text}</div>
+            ${comment.hasHeart ? `<div class="comment-heart">❤️</div>` : ''}
+          </div>
+          ${isEditor ? `<span class="reply-link" onclick="setReplyTo(${commentIndex}, '${commentAuthor.replace(/'/g, "\\'")}', ${depth})">Responder</span>` : ''}
+        </div>
+        ${repliesHtml}
+      `;
+    }).join('');
   }
 
   function deletePost(index) {
@@ -914,6 +1150,7 @@
     if (!isEditor) return;
     currentPostForReactions = postIndex;
     const post = profileData.posts[postIndex];
+    document.getElementById('reaction-emojis').value = post.reactionEmojis || '';
     document.getElementById('reaction-total').value = post.reactions || '';
     document.getElementById('reaction-comments').value = post.comments || '';
     document.getElementById('reaction-shares').value = post.shares || '';
@@ -927,6 +1164,7 @@
   function saveReactions() {
     if (currentPostForReactions === -1) return;
     const post = profileData.posts[currentPostForReactions];
+    post.reactionEmojis = document.getElementById('reaction-emojis').value.trim();
     post.reactions = document.getElementById('reaction-total').value.trim();
     post.comments = document.getElementById('reaction-comments').value.trim();
     post.shares = document.getElementById('reaction-shares').value.trim();
@@ -962,29 +1200,89 @@
     if (!post.commentsData) post.commentsData = [];
     
     selectedCharacter = null;
+    replyToCommentIndex = null;
     document.getElementById('selected-character-name').textContent = '';
+    document.getElementById('reply-to-indicator').style.display = 'none';
     switchTab('comments');
     renderCommentsInModal();
     document.getElementById('comments-modal').style.display = 'flex';
   }
 
+  function setReplyTo(commentIndex, commentAuthor, depth) {
+    replyToCommentIndex = commentIndex;
+    document.getElementById('reply-to-indicator').style.display = 'block';
+    document.getElementById('reply-to-name').textContent = commentAuthor;
+  }
+
+  function cancelReply() {
+    replyToCommentIndex = null;
+    document.getElementById('reply-to-indicator').style.display = 'none';
+  }
+
   function renderCommentsInModal() {
     const post = profileData.posts[currentPostForComments];
-    document.getElementById('comments-list').innerHTML = post.commentsData.map((comment, i) => `
-      <div style="display:flex; justify-content:space-between; align-items:start; padding:8px; background:#f0f2f5; border-radius:8px; margin-bottom:8px;">
-        <div style="flex:1;">
-          <div style="display:flex; align-items:center; gap:8px; margin-bottom:4px;">
-            <img src="${comment.pic || 'https://via.placeholder.com/32'}" style="width:24px; height:24px; border-radius:50%;" alt="">
-            <strong>${comment.author}</strong>
-            ${comment.badge ? `<img src="${comment.badge}" width="12" style="border-radius:50%;">` : ''}
+    const { friends, characters, name, profilePic, badge, styles } = profileData;
+
+    const renderCommentList = (comments, depth = 0) => {
+      return comments.map((comment, i) => {
+        let commentAuthor = 'Desconocido';
+        let commentPic = 'https://via.placeholder.com/32';
+        let commentBadge = '';
+        
+        if (comment.isProfile) {
+          commentAuthor = name || 'Mi Perfil';
+          commentPic = profilePic || 'https://via.placeholder.com/32';
+          commentBadge = badge;
+        } else if (comment.friendIndex !== undefined && friends[comment.friendIndex]) {
+          const friend = friends[comment.friendIndex];
+          commentAuthor = friend.name;
+          commentPic = friend.pic;
+          commentBadge = friend.badge;
+        } else if (comment.characterIndex !== undefined && characters[comment.characterIndex]) {
+          const character = characters[comment.characterIndex];
+          commentAuthor = character.name;
+          commentPic = character.pic;
+          commentBadge = character.badge;
+        } else {
+          commentAuthor = comment.author || 'Desconocido';
+          commentPic = comment.pic || 'https://via.placeholder.com/32';
+          commentBadge = comment.badge || '';
+        }
+
+        const repliesHtml = comment.replies ? renderCommentList(comment.replies, depth + 1) : '';
+
+        return `
+          <div style="display:flex; justify-content:space-between; align-items:start; padding:8px; background:#f0f2f5; border-radius:8px; margin-bottom:8px; margin-left:${depth * 20}px;">
+            <div style="flex:1;">
+              <div style="display:flex; align-items:center; gap:8px; margin-bottom:4px;">
+                <img src="${commentPic}" style="width:24px; height:24px; border-radius:50%;" alt="">
+                <strong>${commentAuthor}</strong>
+                ${commentBadge ? `<img src="${commentBadge}" width="12" style="border-radius:50%;">` : ''}
+                ${comment.hasHeart ? `<span>❤️</span>` : ''}
+              </div>
+              <div style="padding-left:32px;">${comment.text}</div>
+            </div>
+            <div style="display:flex; gap:4px;">
+              <button onclick="toggleCommentHeart(${i})" style="background:${comment.hasHeart ? '#e74c3c' : '#ddd'}; color:white; border:none; padding:4px 8px; border-radius:4px; cursor:pointer; font-size:11px;">❤️</button>
+              <button onclick="removeComment(${i})" style="background:red; color:white; border:none; padding:4px 8px; border-radius:4px; cursor:pointer; flex-shrink:0;">×</button>
+            </div>
           </div>
-          <div style="padding-left:32px;">${comment.text}</div>
-        </div>
-        <button onclick="removeComment(${i})" style="background:red; color:white; border:none; padding:4px 8px; border-radius:4px; cursor:pointer; flex-shrink:0;">×</button>
-      </div>
-    `).join('');
-    
+          ${repliesHtml}
+        `;
+      }).join('');
+    };
+
+    document.getElementById('comments-list').innerHTML = renderCommentList(post.commentsData);
     document.getElementById('new-comment-text').value = '';
+  }
+
+  function toggleCommentHeart(commentIndex) {
+    const post = profileData.posts[currentPostForComments];
+    if (post.commentsData[commentIndex]) {
+      post.commentsData[commentIndex].hasHeart = !post.commentsData[commentIndex].hasHeart;
+      saveProfile();
+      renderCommentsInModal();
+    }
   }
 
   function openCharacterSelector() {
@@ -997,30 +1295,51 @@
       name: profileData.name || 'Mi Perfil',
       pic: profileData.profilePic || 'https://via.placeholder.com/40',
       badge: profileData.badge,
-      isProfile: true
+      type: 'profile'
     };
 
     const friendChars = (profileData.friends || []).map((f, idx) => ({
       name: f.name,
       pic: f.pic,
       badge: f.badge,
-      isFriend: true,
-      friendIndex: idx
+      type: 'friend',
+      index: idx
     }));
 
-    const allChars = [profileChar, ...friendChars, ...(profileData.characters || [])];
+    const customChars = (profileData.characters || []).map((c, idx) => ({
+      name: c.name,
+      pic: c.pic,
+      badge: c.badge,
+      type: 'character',
+      index: idx
+    }));
 
-    document.getElementById('character-selector-list').innerHTML = allChars.map((char, i) => `
-      <div class="character-item ${char.isProfile ? 'profile-character' : ''} ${char.isFriend ? 'friend-character' : ''}" onclick="selectCharacterForComment(${i})">
-        <img src="${char.pic}" alt="">
-        <div style="flex:1;">
-          <strong>${char.name}</strong>
-          ${char.badge ? `<img src="${char.badge}" width="12" style="border-radius:50%; margin-left:4px; vertical-align:middle;">` : ''}
-          ${char.isProfile ? '<span style="color:var(--fb-blue); font-size:12px; margin-left:8px;">(Tu perfil)</span>' : ''}
-          ${char.isFriend ? '<span style="color:#65676b; font-size:12px; margin-left:8px;">(Amigo)</span>' : ''}
+    const allChars = [profileChar, ...friendChars, ...customChars];
+
+    document.getElementById('character-selector-list').innerHTML = allChars.map((char, i) => {
+      let infoText = '';
+      let className = '';
+      if (char.type === 'profile') {
+        infoText = '<span style="color:var(--fb-blue); font-size:12px; margin-left:8px;">(Tu perfil)</span>';
+        className = 'profile-character';
+      } else if (char.type === 'friend') {
+        infoText = '<span style="color:#65676b; font-size:12px; margin-left:8px;">(Amigo)</span>';
+        className = 'friend-character';
+      } else if (char.fromFriend) {
+        infoText = '<span style="color:#65676b; font-size:12px; margin-left:8px;">(Personaje - antes amigo)</span>';
+      }
+
+      return `
+        <div class="character-item ${className}" onclick="selectCharacterForComment(${i})">
+          <img src="${char.pic}" alt="">
+          <div style="flex:1;">
+            <strong>${char.name}</strong>
+            ${char.badge ? `<img src="${char.badge}" width="12" style="border-radius:50%; margin-left:4px; vertical-align:middle;">` : ''}
+            ${infoText}
+          </div>
         </div>
-      </div>
-    `).join('');
+      `;
+    }).join('');
   }
 
   function selectCharacterForComment(index) {
@@ -1028,18 +1347,26 @@
       name: profileData.name || 'Mi Perfil',
       pic: profileData.profilePic || 'https://via.placeholder.com/32',
       badge: profileData.badge,
-      isProfile: true
+      type: 'profile'
     };
 
     const friendChars = (profileData.friends || []).map((f, idx) => ({
       name: f.name,
       pic: f.pic,
       badge: f.badge,
-      isFriend: true,
-      friendIndex: idx
+      type: 'friend',
+      index: idx
     }));
 
-    const allChars = [profileChar, ...friendChars, ...(profileData.characters || [])];
+    const customChars = (profileData.characters || []).map((c, idx) => ({
+      name: c.name,
+      pic: c.pic,
+      badge: c.badge,
+      type: 'character',
+      index: idx
+    }));
+    
+    const allChars = [profileChar, ...friendChars, ...customChars];
     
     selectedCharacter = allChars[index];
     document.getElementById('selected-character-name').textContent = selectedCharacter.name;
@@ -1060,25 +1387,29 @@
     if (!post.commentsData) post.commentsData = [];
     
     const commentData = {
-      author: selectedCharacter.name,
       text: text,
-      pic: selectedCharacter.pic,
-      badge: selectedCharacter.badge || ''
+      isProfile: selectedCharacter.type === 'profile' ? true : undefined,
+      friendIndex: selectedCharacter.type === 'friend' ? selectedCharacter.index : undefined,
+      characterIndex: selectedCharacter.type === 'character' ? selectedCharacter.index : undefined,
+      hasHeart: false,
+      replies: []
     };
     
-    // Marcar si es perfil o amigo para actualizaciones automáticas
-    if (selectedCharacter.isProfile) {
-      commentData.isProfile = true;
-    } else if (selectedCharacter.isFriend) {
-      commentData.friendIndex = selectedCharacter.friendIndex;
+    if (replyToCommentIndex !== null) {
+      if (!post.commentsData[replyToCommentIndex].replies) {
+        post.commentsData[replyToCommentIndex].replies = [];
+      }
+      post.commentsData[replyToCommentIndex].replies.push(commentData);
+      cancelReply();
+    } else {
+      post.commentsData.push(commentData);
     }
-    
-    post.commentsData.push(commentData);
     
     saveProfile();
     renderCommentsInModal();
     selectedCharacter = null;
     document.getElementById('selected-character-name').textContent = '';
+    document.getElementById('new-comment-text').value = '';
   }
 
   function removeComment(commentIndex) {
@@ -1089,24 +1420,30 @@
   }
 
   function renderCharactersList() {
-    const profileChar = {
-      name: profileData.name || 'Mi Perfil',
-      pic: profileData.profilePic || 'https://via.placeholder.com/40',
-      badge: profileData.badge,
-      isProfile: true
+    const { friends, characters, name, profilePic, badge } = profileData;
+
+    constprofileChar = {
+      name: name || 'Mi Perfil',
+      pic: profilePic || 'https://via.placeholder.com/40',
+      badge: badge,
+      type: 'profile'
     };
 
-    const friendChars = (profileData.friends || []).map(f => ({
+    const friendChars = (friends || []).map(f => ({
       name: f.name,
       pic: f.pic,
       badge: f.badge,
-      isFriend: true
+      type: 'friend'
     }));
 
-    const allChars = [profileChar, ...friendChars, ...(profileData.characters || [])];
+    const customChars = characters || [];
+
+    const allChars = [profileChar, ...friendChars, ...customChars];
+    const friendCount = friendChars.length;
+    let customCharIndex = 0;
 
     document.getElementById('characters-list').innerHTML = allChars.map((char, i) => {
-      if (char.isProfile) {
+      if (char.type === 'profile') {
         return `
           <div class="character-item profile-character">
             <img src="${char.pic}" alt="">
@@ -1117,53 +1454,57 @@
             </div>
           </div>
         `;
-      } else if (char.isFriend) {
+      } else if (char.type === 'friend') {
         return `
           <div class="character-item friend-character">
             <img src="${char.pic}" alt="">
             <div style="flex:1;">
               <strong>${char.name}</strong>
               ${char.badge ? `<img src="${char.badge}" width="14" style="border-radius:50%; margin-left:4px; vertical-align:middle;">` : ''}
-              <div style="color:#65676b; font-size:12px;">Amigo (se actualiza automáticamente)</div>
+              <div style="color:#65676b; font-size:12px;">Amigo (se actualiza automáticamente - edita en la sección Amigos)</div>
             </div>
           </div>
         `;
       } else {
-        const realIndex = i - 1 - (profileData.friends || []).length;
+        const realIndex = customCharIndex;
+        customCharIndex++;
         return `
           <div class="character-item">
             <img src="${char.pic}" alt="">
             <div style="flex:1;">
               <strong>${char.name}</strong>
               ${char.badge ? `<img src="${char.badge}" width="14" style="border-radius:50%; margin-left:4px; vertical-align:middle;">` : ''}
-              ${char.fromFriend ? '<div style="color:#65676b; font-size:12px;">(Antes era amigo)</div>' : ''}
+              ${char.fromFriend ? '<div style="color:#65676b; font-size:12px;">(Personaje independiente - antes era amigo)</div>' : ''}
             </div>
             <button onclick="deleteCharacter(${realIndex})" style="background:red; color:white; border:none; padding:6px 12px; border-radius:6px; cursor:pointer;">Eliminar</button>
           </div>
         `;
       }
     }).join('');
+    
+    tempCharPic = null;
+    document.getElementById('new-char-pic-name').textContent = 'Sin foto';
   }
 
   function saveCharacter() {
     const name = document.getElementById('new-char-name').value.trim();
-    const pic = document.getElementById('new-char-pic').value.trim();
     
     if (!name) return alert("Escribe un nombre para el personaje");
-    if (!pic) return alert("Añade una URL de foto");
+    if (!tempCharPic) return alert("Añade una foto (archivo o URL) para el personaje");
     
     if (!profileData.characters) profileData.characters = [];
     
     profileData.characters.push({
       name: name,
-      pic: pic,
+      pic: tempCharPic,
       badge: tempCharBadge,
       fromFriend: false
     });
     
     document.getElementById('new-char-name').value = '';
-    document.getElementById('new-char-pic').value = '';
+    tempCharPic = null;
     tempCharBadge = '';
+    document.getElementById('new-char-pic-name').textContent = 'Sin foto';
     document.getElementById('char-badge-preview').innerHTML = '';
     
     saveProfile();
@@ -1172,10 +1513,26 @@
   }
 
   function deleteCharacter(index) {
-    if (confirm('¿Eliminar este personaje?')) {
+    if (confirm('¿Eliminar este personaje? Todos sus comentarios quedarán como "Desconocido".')) {
+      profileData.posts.forEach(post => {
+        if (post.commentsData) {
+          post.commentsData = post.commentsData.filter(comment => {
+            if (comment.characterIndex !== undefined) {
+              if (comment.characterIndex === index) {
+                return false; 
+              } else if (comment.characterIndex > index) {
+                comment.characterIndex -= 1;
+              }
+            }
+            return true;
+          });
+        }
+      });
+      
       profileData.characters.splice(index, 1);
       saveProfile();
       renderCharactersList();
+      renderPosts();
     }
   }
 
@@ -1188,38 +1545,22 @@
     editingFriendIndex = index;
     document.getElementById('add-friend-modal').style.display = 'flex';
     
+    let friend = null;
     if (index === -1) {
-      // Añadir nuevo
       document.getElementById('friend-modal-title').textContent = 'Añadir Amigo';
       tempFriendPic = null;
       tempFriendBadge = "";
       document.getElementById('friend-name').value = "";
-      document.getElementById('friend-pic-name').textContent = "Sin foto";
-      document.getElementById('friend-badge-preview').innerHTML = "";
     } else {
-      // Editar existente
       document.getElementById('friend-modal-title').textContent = 'Editar Amigo';
-      const friend = profileData.friends[index];
+      friend = profileData.friends[index];
       document.getElementById('friend-name').value = friend.name;
       tempFriendPic = friend.pic;
       tempFriendBadge = friend.badge || "";
-      document.getElementById('friend-pic-name').textContent = "Foto actual";
-      document.getElementById('friend-badge-preview').innerHTML = friend.badge ? `<img src="${friend.badge}" width="14" style="border-radius:50%;">` : "Ninguna";
     }
     
-    const input = document.getElementById('friend-pic-input');
-    input.value = '';
-    input.onchange = function(e) {
-      const file = e.target.files[0];
-      if (file) {
-        const reader = new FileReader();
-        reader.onload = () => {
-          tempFriendPic = reader.result;
-          document.getElementById('friend-pic-name').textContent = file.name;
-        };
-        reader.readAsDataURL(file);
-      }
-    };
+    document.getElementById('friend-pic-name').textContent = tempFriendPic ? "Foto actual" : "Sin foto";
+    document.getElementById('friend-badge-preview').innerHTML = tempFriendBadge ? `<img src="${tempFriendBadge}" width="14" style="border-radius:50%;">` : "Ninguna";
   }
 
   function closeAddFriendModal() {
@@ -1239,52 +1580,15 @@
     };
     
     if (editingFriendIndex === -1) {
-      // Añadir nuevo
       profileData.friends.push(friendData);
     } else {
-      // Editar existente
       profileData.friends[editingFriendIndex] = friendData;
     }
     
     saveProfile();
     renderFriends();
-    updateCommentsWithProfileChanges();
+    renderPosts();
     closeAddFriendModal();
-  }
-
-  function addPostImage() {
-    const input = document.createElement('input');
-    input.type = 'file';
-    input.accept = 'image/*';
-    input.onchange = e => {
-      const file = e.target.files[0];
-      if (!file) return;
-      const reader = new FileReader();
-      reader.onload = () => {
-        tempPostImage = reader.result;
-        alert('Imagen seleccionada. Ahora escribe tu texto y presiona Publicar.');
-      };
-      reader.readAsDataURL(file);
-    };
-    input.click();
-  }
-
-  function changePostImage(i) {
-    const input = document.createElement('input');
-    input.type = 'file';
-    input.accept = 'image/*';
-    input.onchange = e => {
-      const file = e.target.files[0];
-      if (!file) return;
-      const reader = new FileReader();
-      reader.onload = () => {
-        profileData.posts[i].image = reader.result;
-        saveProfile();
-        renderPosts();
-      };
-      reader.readAsDataURL(file);
-    };
-    input.click();
   }
 
   function createNewPost() {
@@ -1299,6 +1603,7 @@
       reactions: '',
       comments: '',
       shares: '',
+      reactionEmojis: '',
       commentsData: [],
       time: "Ahora mismo"
     });
@@ -1308,22 +1613,249 @@
     saveProfile();
     renderPosts();
   }
+  
+  // IMAGEN UPLOAD MODAL
+  
+  function openImageUploadModal(target, postIndex = -1) {
+    currentImageTarget = target;
+    currentImageSourceType = 'file';
+    currentImagePreviewData = null;
+    currentImageCallback = null;
+    document.getElementById('image-preview').style.display = 'none';
+    document.getElementById('generic-file-input').value = '';
+    document.getElementById('generic-url-input').value = '';
+    document.getElementById('file-name-preview').textContent = 'Sin archivo seleccionado';
 
-  function changeImage(callback) {
-    const input = document.createElement('input');
-    input.type = 'file';
-    input.accept = 'image/*';
-    input.onchange = e => {
+    if (target === 'cover') {
+        document.getElementById('image-upload-title').textContent = 'Cambiar Portada';
+        currentImagePreviewData = profileData.cover;
+        currentImageCallback = src => { profileData.cover = src; saveProfile(); renderAll(); };
+    } else if (target === 'profilePic') {
+        document.getElementById('image-upload-title').textContent = 'Cambiar Foto de Perfil';
+        currentImagePreviewData = profileData.profilePic;
+        currentImageCallback = src => { profileData.profilePic = src; saveProfile(); renderAll(); };
+    } else if (target === 'newPostImage') {
+        document.getElementById('image-upload-title').textContent = 'Añadir Foto al Post';
+        currentImagePreviewData = tempPostImage;
+        currentImageCallback = src => { tempPostImage = src; alert('Imagen seleccionada. Ahora escribe tu texto y presiona Publicar.'); closeImageUploadModal(); };
+    } else if (target === 'editPostImage') {
+        document.getElementById('image-upload-title').textContent = 'Editar Foto del Post';
+        currentPostForReactions = postIndex;
+        const post = profileData.posts[postIndex];
+        currentImagePreviewData = post.image;
+        currentImageCallback = src => { post.image = src; saveProfile(); renderPosts(); closeImageUploadModal(); };
+    } else if (target === 'friend') {
+        document.getElementById('image-upload-title').textContent = 'Cambiar Foto de Amigo';
+        currentImagePreviewData = tempFriendPic;
+        currentImageCallback = src => { tempFriendPic = src; document.getElementById('friend-pic-name').textContent = "Foto seleccionada"; closeImageUploadModal(); };
+    } else if (target === 'character') {
+        document.getElementById('image-upload-title').textContent = 'Cambiar Foto de Personaje';
+        currentImagePreviewData = tempCharPic;
+        currentImageCallback = src => { tempCharPic = src; document.getElementById('new-char-pic-name').textContent = "Foto seleccionada"; closeImageUploadModal(); };
+    }
+    
+    switchImageInput('file');
+    if (currentImagePreviewData) {
+        document.getElementById('image-preview').src = currentImagePreviewData;
+        document.getElementById('image-preview').style.display = 'block';
+    }
+
+    document.getElementById('image-upload-modal').style.display = 'flex';
+  }
+  
+  function openPostImageModal(target, index = -1) {
+    if (target === 'new') {
+        openImageUploadModal('newPostImage');
+    } else {
+        openImageUploadModal('editPostImage', index);
+    }
+  }
+
+  function switchImageInput(type) {
+      currentImageSourceType = type;
+      document.getElementById('file-input-section').style.display = type === 'file' ? 'block' : 'none';
+      document.getElementById('url-input-section').style.display = type === 'url' ? 'block' : 'none';
+      
+      document.getElementById('btn-file-input').style.background = type === 'file' ? 'var(--fb-blue)' : '#ddd';
+      document.getElementById('btn-url-input').style.background = type === 'url' ? 'var(--fb-blue)' : '#ddd';
+      document.getElementById('btn-file-input').style.color = type === 'file' ? 'white' : 'var(--text)';
+      document.getElementById('btn-url-input').style.color = type === 'url' ? 'white' : 'var(--text)';
+      
+      if (type === 'file') {
+          document.getElementById('generic-url-input').value = '';
+      } else {
+          document.getElementById('generic-file-input').value = '';
+          document.getElementById('file-name-preview').textContent = 'Sin archivo seleccionado';
+      }
+      document.getElementById('image-preview').style.display = 'none';
+  }
+
+  function previewFile(e) {
       const file = e.target.files[0];
       if (!file) return;
+      document.getElementById('file-name-preview').textContent = file.name;
       const reader = new FileReader();
       reader.onload = () => {
-        callback(reader.result);
-        renderAll();
+          currentImagePreviewData = reader.result;
+          document.getElementById('image-preview').src = currentImagePreviewData;
+          document.getElementById('image-preview').style.display = 'block';
       };
       reader.readAsDataURL(file);
-    };
-    input.click();
+  }
+
+  function previewUrl(e) {
+      currentImagePreviewData = e.target.value.trim();
+      document.getElementById('image-preview').src = currentImagePreviewData;
+      document.getElementById('image-preview').style.display = currentImagePreviewData ? 'block' : 'none';
+  }
+
+  function closeImageUploadModal() {
+      document.getElementById('image-upload-modal').style.display = 'none';
+  }
+
+  function saveImage() {
+      if (!currentImagePreviewData || currentImagePreviewData.trim() === '') {
+          return alert(currentImageSourceType === 'file' ? 'Selecciona un archivo' : 'Pega un link/URL');
+      }
+      
+      if (currentImageCallback) {
+          currentImageCallback(currentImagePreviewData);
+      }
+      
+      closeImageUploadModal();
+  }
+  
+  // ESTILOS
+  
+  const styleElements = [
+    { id: 'fontFamilyProfile', name: 'Nombre de Perfil (Fuente)', type: 'font' },
+    { id: 'fontSizeProfile', name: 'Nombre de Perfil (Tamaño)', type: 'size' },
+    { id: 'fontFamilyFollowers', name: 'Seguidores (Fuente)', type: 'font' },
+    { id: 'fontSizeFollowers', name: 'Seguidores (Tamaño)', type: 'size' },
+    { id: 'fontFamilyInfo', name: 'Información (Fuente)', type: 'font' },
+    { id: 'fontSizeInfo', name: 'Información (Tamaño)', type: 'size' },
+    { id: 'fontFamilyPostText', name: 'Post Texto (Fuente)', type: 'font' },
+    { id: 'fontSizePostText', name: 'Post Texto (Tamaño)', type: 'size' },
+    { id: 'fontFamilyPostTime', name: 'Post Hora (Fuente)', type: 'font' },
+    { id: 'fontSizePostTime', name: 'Post Hora (Tamaño)', type: 'size' },
+    { id: 'fontFamilyComment', name: 'Comentario (Fuente)', type: 'font' },
+    { id: 'fontSizeComment', name: 'Comentario (Tamaño)', type: 'size' },
+    { id: 'fontFamilyFriend', name: 'Amigo (Fuente)', type: 'font' },
+    { id: 'fontSizeFriend', name: 'Amigo (Tamaño)', type: 'size' },
+  ];
+
+  function openStyleModal() {
+    const container = document.getElementById('style-controls');
+    
+    const grouped = {};
+    styleElements.forEach(item => {
+      const base = item.id.replace(/^(fontFamily|fontSize)/, '');
+      if (!grouped[base]) grouped[base] = [];
+      grouped[base].push(item);
+    });
+    
+    container.innerHTML = Object.keys(grouped).map(base => {
+      const items = grouped[base];
+      return `
+        <div class="style-control-group">
+          <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:8px;">
+            <h4 style="margin:0;">${items[0].name.split(' (')[0]}</h4>
+            <button onclick="resetStyleGroup('${base}')" style="background:#e74c3c; color:white; font-size:11px; padding:4px 8px;">Restablecer</button>
+          </div>
+          ${items.map(item => {
+            let inputHtml;
+            const currentValue = profileData.styles[item.id] || '';
+            
+            if (item.type === 'font') {
+              inputHtml = `
+                <input type="text" id="${item.id}" value="${currentValue}" list="font-datalist" style="width:100%;">
+              `;
+            } else {
+              const sizeValue = currentValue.replace('px', '');
+              inputHtml = `
+                <input type="number" id="${item.id}" value="${sizeValue}" min="8" max="72" style="width:80%; display:inline;"> px
+              `;
+            }
+            
+            return `
+              <p style="margin-bottom:8px;">
+                <label style="display:block; font-weight:500; margin-bottom:4px; font-size:13px;">${item.type === 'font' ? 'Fuente' : 'Tamaño'}:</label>
+                ${inputHtml}
+              </p>
+            `;
+          }).join('')}
+        </div>
+      `;
+    }).join('') + `
+      <datalist id="font-datalist">
+        ${FONT_OPTIONS.map(font => `<option value="${font}"></option>`).join('')}
+      </datalist>
+    `;
+    
+    document.getElementById('style-modal').style.display = 'flex';
+  }
+
+  function resetStyleGroup(base) {
+    const items = styleElements.filter(item => item.id.includes(base));
+    items.forEach(item => {
+      profileData.styles[item.id] = DEFAULT_STYLES[item.id];
+      const el = document.getElementById(item.id);
+      if (el) {
+        if (item.type === 'size') {
+          el.value = DEFAULT_STYLES[item.id].replace('px', '');
+        } else {
+          el.value = DEFAULT_STYLES[item.id];
+        }
+      }
+    });
+    applyStylesToCSS();
+    saveProfile();
+    renderAll();
+  }
+
+  function resetAllStyles() {
+    if (!confirm('¿Restablecer todos los estilos a los valores predeterminados?')) return;
+    
+    profileData.styles = {...DEFAULT_STYLES};
+    applyStylesToCSS();
+    saveProfile();
+    openStyleModal();
+    renderAll();
+  }
+
+  function closeStyleModal() {
+    document.getElementById('style-modal').style.display = 'none';
+  }
+
+  function applyStyles() {
+    styleElements.forEach(item => {
+      let value = document.getElementById(item.id).value.trim();
+      
+      if (item.type === 'size') {
+        if (value && !isNaN(parseInt(value))) {
+          value = `${parseInt(value)}px`;
+        } else {
+            value = profileData.styles[item.id];
+        }
+      }
+      
+      profileData.styles[item.id] = value;
+    });
+    
+    applyStylesToCSS();
+    saveProfile();
+    renderAll();
+    closeStyleModal();
+  }
+  
+  function applyStylesToCSS() {
+      const styleEl = document.documentElement.style;
+      for (const key in profileData.styles) {
+          if (profileData.styles.hasOwnProperty(key)) {
+              const cssVar = `--${key.replace(/([a-z0-9]|(?=[A-Z]))([A-Z])/g, '$1-$2').toLowerCase()}`;
+              styleEl.setProperty(cssVar, profileData.styles[key]);
+          }
+      }
   }
 
   function saveProfile() {
@@ -1334,11 +1866,46 @@
     const saved = localStorage.getItem('fbProfile2025');
     if (saved) {
       try {
-        profileData = JSON.parse(saved);
-        if (!profileData.photos) profileData.photos = [];
-        if (!profileData.friends) profileData.friends = [];
-        if (!profileData.posts) profileData.posts = [];
-        if (!profileData.characters) profileData.characters = [];
+        const loadedData = JSON.parse(saved);
+        
+        if (!loadedData.styles) {
+            loadedData.styles = {...DEFAULT_STYLES};
+        } else {
+            profileData.styles = { ...DEFAULT_STYLES, ...loadedData.styles };
+            loadedData.styles = profileData.styles;
+        }
+
+        if (loadedData.posts) {
+            loadedData.posts.forEach(post => {
+                if (!post.reactionEmojis) post.reactionEmojis = '';
+                if (post.commentsData) {
+                    post.commentsData.forEach(comment => {
+                        if (!comment.hasHeart) comment.hasHeart = false;
+                        if (!comment.replies) comment.replies = [];
+                        if (comment.isProfile || comment.friendIndex !== undefined || comment.characterIndex !== undefined) {
+                            delete comment.author;
+                            delete comment.pic;
+                            delete comment.badge;
+                        }
+                    });
+                }
+            });
+        }
+        
+        profileData = {
+          name: loadedData.name || "",
+          profilePic: loadedData.profilePic || "",
+          cover: loadedData.cover || "",
+          badge: loadedData.badge || "",
+          followers: loadedData.followers || "",
+          info: loadedData.info || "",
+          photos: loadedData.photos || [],
+          friends: loadedData.friends || [],
+          posts: loadedData.posts || [],
+          characters: loadedData.characters || [],
+          styles: loadedData.styles
+        };
+        
       } catch (e) {
         console.error('Error al cargar perfil:', e);
       }
@@ -1362,16 +1929,52 @@
     const reader = new FileReader();
     reader.onload = ev => {
       try {
-        profileData = JSON.parse(ev.target.result);
-        if (!profileData.photos) profileData.photos = [];
-        if (!profileData.friends) profileData.friends = [];
-        if (!profileData.posts) profileData.posts = [];
-        if (!profileData.characters) profileData.characters = [];
+        let importedData = JSON.parse(ev.target.result);
+        
+        if (!importedData.styles) {
+            importedData.styles = {...DEFAULT_STYLES};
+        } else {
+            profileData.styles = { ...DEFAULT_STYLES, ...importedData.styles };
+            importedData.styles = profileData.styles;
+        }
+
+        if (importedData.posts) {
+            importedData.posts.forEach(post => {
+                if (!post.reactionEmojis) post.reactionEmojis = '';
+                if (post.commentsData) {
+                    post.commentsData.forEach(comment => {
+                        if (!comment.hasHeart) comment.hasHeart = false;
+                        if (!comment.replies) comment.replies = [];
+                        if (comment.isProfile || comment.friendIndex !== undefined || comment.characterIndex !== undefined) {
+                            delete comment.author;
+                            delete comment.pic;
+                            delete comment.badge;
+                        }
+                    });
+                }
+            });
+        }
+        
+        profileData = {
+          name: importedData.name || "",
+          profilePic: importedData.profilePic || "",
+          cover: importedData.cover || "",
+          badge: importedData.badge || "",
+          followers: importedData.followers || "",
+          info: importedData.info || "",
+          photos: importedData.photos || [],
+          friends: importedData.friends || [],
+          posts: importedData.posts || [],
+          characters: importedData.characters || [],
+          styles: importedData.styles
+        };
+
         saveProfile();
+        applyStylesToCSS();
         renderAll();
         alert("Perfil importado correctamente");
       } catch (error) {
-        alert("Error al importar el archivo");
+        alert("Error al importar el archivo: " + error.message);
       }
     };
     reader.readAsText(file);
