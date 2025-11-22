@@ -67,6 +67,12 @@
     .header-right .reset-btn {
       background: #e74c3c;
     }
+    .version-info {
+      color: #65676b;
+      font-size: 14px;
+      font-weight: 400;
+      white-space: nowrap;
+    }
 
     /* Modo Editor */
     .edit-mode-only { display: none; }
@@ -487,6 +493,50 @@
       margin-top: 8px;
     }
 
+    /* Image Crop Canvas */
+    .crop-container {
+      position: relative;
+      width: 100%;
+      max-width: 500px;
+      margin: 20px auto;
+      background: #000;
+      border-radius: 8px;
+      overflow: hidden;
+    }
+    .crop-canvas-wrapper {
+      position: relative;
+      width: 100%;
+      height: 400px;
+      overflow: hidden;
+      cursor: move;
+      background: #000;
+    }
+    .crop-canvas {
+      position: absolute;
+      max-width: none;
+    }
+    .crop-controls {
+      background: #f0f2f5;
+      padding: 12px;
+      display: flex;
+      gap: 12px;
+      align-items: center;
+      justify-content: center;
+      flex-wrap: wrap;
+    }
+    .crop-controls button {
+      background: var(--fb-blue);
+      color: white;
+      border: none;
+      padding: 8px 16px;
+      border-radius: 6px;
+      cursor: pointer;
+      font-weight: 600;
+    }
+    .crop-controls input[type="range"] {
+      width: 150px;
+    }
+
     @media print {
       .header, .edit-mode-only, .no-print { display: none !important; }
       body { background: white; }
@@ -499,6 +549,7 @@
       .profile-info { margin-left: 0; margin-top: 12px; }
       .header { flex-direction: column; gap: 8px; }
       .header-left, .header-right { width: 100%; justify-content: center; }
+      .version-info { text-align: center; width: 100%; }
     }
   </style>
 </head>
@@ -513,6 +564,7 @@
       <button class="edit-mode-only" onclick="toggleEditMode()">Salir del Editor</button>
     </div>
     <div class="header-right" style="margin-left: auto;">
+      <span class="version-info view-mode-only">Fakebook-Fabijose21-v3.0</span>
       <button class="edit-mode-only" onclick="openStyleModal()">Personalizar Estilo</button>
       <button class="edit-mode-only reset-btn" onclick="resetProfile()">Resetear Perfil</button>
       <button class="edit-mode-only" onclick="exportProfile()">Exportar</button>
@@ -525,10 +577,10 @@
 
 <div class="container">
   <div class="cover-container">
-    <img id="cover-photo" src="" alt="Cover" style="background:#ccc;" />
+    <img id="cover-photo" src="" alt="Cover" style="background:#ccc;" onclick="isEditor && openImageUploadModal('cover')" />
     <button class="edit-mode-only" style="position:absolute; bottom:16px; right:16px; background:rgba(0,0,0,0.6); color:white; border:none; padding:8px 16px; border-radius:6px; cursor:pointer;" onclick="openImageUploadModal('cover')">Cambiar Portada</button>
     <div class="profile-section">
-      <img id="profile-pic" src="" alt="Perfil" style="background:#e4e6eb;" />
+      <img id="profile-pic" src="" alt="Perfil" style="background:#e4e6eb;" onclick="isEditor && openImageUploadModal('profilePic')" />
       <button class="edit-mode-only" style="position:absolute; top:-40px; left:120px; background:rgba(0,0,0,0.6); color:white; border:none; padding:8px; border-radius:50%; width:40px; height:40px; cursor:pointer; line-height:24px;" onclick="openImageUploadModal('profilePic')">📷</button>
       <div class="profile-info">
         <h1 id="profile-name" contenteditable="false">
@@ -603,9 +655,9 @@
   </div>
 </div>
 
-<!-- Modal Imagen Upload -->
+<!-- Modal Imagen Upload con Recorte -->
 <div class="modal" id="image-upload-modal" style="display:none; z-index: 2000;">
-  <div class="modal-content" style="z-index: 2001;">
+  <div class="modal-content" style="z-index: 2001; max-width: 600px;">
     <h3 id="image-upload-title">Cambiar Imagen</h3>
     <div style="margin-bottom:12px;">
       <button onclick="switchImageInput('file')" id="btn-file-input">Subir Archivo</button>
@@ -624,13 +676,30 @@
       <p>Link/URL: <input type="url" id="generic-url-input" placeholder="https://..." oninput="previewUrl(event)"></p>
     </div>
     
-    <div style="text-align:center; margin-top:16px;">
+    <div id="crop-section" style="display:none;">
+      <div class="crop-container">
+        <div class="crop-canvas-wrapper" id="crop-canvas-wrapper">
+          <img id="crop-canvas" class="crop-canvas" src="" alt="Imagen para recortar">
+        </div>
+        <div class="crop-controls">
+          <label>Zoom: <input type="range" id="zoom-slider" min="50" max="200" value="100" oninput="updateZoom(this.value)"></label>
+          <button onclick="resetCrop()">Reiniciar</button>
+        </div>
+      </div>
+      <p style="text-align:center; color:#65676b; font-size:13px; margin-top:8px;">
+        Arrastra la imagen para reposicionar. Usa el zoom para ajustar el tamaño.
+      </p>
+    </div>
+    
+    <div style="text-align:center; margin-top:16px;" id="simple-preview-section">
         <img id="image-preview" src="" style="max-width:100%; max-height:200px; display:none; border:1px solid #ddd; border-radius:4px;">
     </div>
 
     <div style="margin-top:20px; text-align:right;">
       <button onclick="closeImageUploadModal()">Cancelar</button>
-      <button style="background:var(--fb-blue);color:white;" onclick="saveImage()">Guardar Imagen</button>
+      <button id="enable-crop-btn" onclick="enableCropMode()" style="background:#27ae60; color:white; display:none;">Recortar/Mover</button>
+      <button id="use-default-btn" onclick="saveImage()" style="background:#95a5a6; color:white; display:none;">Usar Predeterminado</button>
+      <button id="save-image-btn" style="background:var(--fb-blue);color:white;" onclick="saveImage()">Guardar Imagen</button>
     </div>
   </div>
 </div>
@@ -757,6 +826,16 @@
   let currentImageSourceType = 'file';
   let currentImagePreviewData = null;
   let currentImageCallback = null;
+  
+  // Crop variables
+  let cropMode = false;
+  let cropX = 0;
+  let cropY = 0;
+  let cropZoom = 100;
+  let isDragging = false;
+  let startDragX = 0;
+  let startDragY = 0;
+  let cropOriginalImage = null;
   
   const FONT_OPTIONS = ['Arial', 'Verdana', 'Tahoma', 'Trebuchet MS', 'Times New Roman', 'Georgia', 'Courier New', 'Monospace', 'Segoe UI'];
 
@@ -1107,7 +1186,7 @@
               ${name || 'Usuario'}
               ${badge ? `<img class="badge" src="${badge}" style="width:18px;height:18px;">` : ''}
             </div>
-            <div class="post-time" contenteditable="${isEditor}" oninput="updatePostTime(${i}, this.textContent)">${post.time || "Ahora mismo"} · 🌍</div>
+            <div class="post-time" contenteditable="${isEditor}" oninput="updatePostTime(${i}, this.textContent)">${post.time || "Ahora mismo"} · 🌐</div>
           </div>
           ${isEditor ? `
             <button style="margin-left:auto;background:none;border:none;font-size:24px;cursor:pointer;" onclick="deletePost(${i})">×</button>
@@ -1729,14 +1808,21 @@
     renderPosts();
   }
   
-  // IMAGEN UPLOAD MODAL
+  // IMAGEN UPLOAD MODAL CON RECORTE
   
   function openImageUploadModal(target, postIndex = -1) {
     currentImageTarget = target;
     currentImageSourceType = 'file';
     currentImagePreviewData = null;
     currentImageCallback = null;
+    cropMode = false;
+    
     document.getElementById('image-preview').style.display = 'none';
+    document.getElementById('crop-section').style.display = 'none';
+    document.getElementById('simple-preview-section').style.display = 'block';
+    document.getElementById('enable-crop-btn').style.display = 'none';
+    document.getElementById('use-default-btn').style.display = 'none';
+    
     document.getElementById('generic-file-input').value = '';
     document.getElementById('generic-url-input').value = '';
     document.getElementById('file-name-preview').textContent = 'Sin archivo seleccionado';
@@ -1803,6 +1889,11 @@
           document.getElementById('file-name-preview').textContent = 'Sin archivo seleccionado';
       }
       document.getElementById('image-preview').style.display = 'none';
+      document.getElementById('crop-section').style.display = 'none';
+      document.getElementById('simple-preview-section').style.display = 'block';
+      document.getElementById('enable-crop-btn').style.display = 'none';
+      document.getElementById('use-default-btn').style.display = 'none';
+      cropMode = false;
   }
 
   function previewFile(e) {
@@ -1812,20 +1903,122 @@
       const reader = new FileReader();
       reader.onload = () => {
           currentImagePreviewData = reader.result;
+          cropOriginalImage = reader.result;
           document.getElementById('image-preview').src = currentImagePreviewData;
           document.getElementById('image-preview').style.display = 'block';
+          document.getElementById('enable-crop-btn').style.display = 'inline-block';
       };
       reader.readAsDataURL(file);
   }
 
   function previewUrl(e) {
       currentImagePreviewData = e.target.value.trim();
+      cropOriginalImage = currentImagePreviewData;
       document.getElementById('image-preview').src = currentImagePreviewData;
       document.getElementById('image-preview').style.display = currentImagePreviewData ? 'block' : 'none';
+      if (currentImagePreviewData) {
+          document.getElementById('enable-crop-btn').style.display = 'inline-block';
+      } else {
+          document.getElementById('enable-crop-btn').style.display = 'none';
+      }
+  }
+
+  function enableCropMode() {
+      if (!currentImagePreviewData) return alert('Primero selecciona una imagen');
+      
+      cropMode = true;
+      cropX = 0;
+      cropY = 0;
+      cropZoom = 100;
+      
+      document.getElementById('simple-preview-section').style.display = 'none';
+      document.getElementById('crop-section').style.display = 'block';
+      document.getElementById('enable-crop-btn').style.display = 'none';
+      document.getElementById('use-default-btn').style.display = 'inline-block';
+      
+      const cropCanvas = document.getElementById('crop-canvas');
+      cropCanvas.src = cropOriginalImage;
+      document.getElementById('zoom-slider').value = 100;
+      
+      cropCanvas.onload = () => {
+          resetCrop();
+      };
+      
+      setupCropHandlers();
+  }
+
+  function setupCropHandlers() {
+      const wrapper = document.getElementById('crop-canvas-wrapper');
+      const canvas = document.getElementById('crop-canvas');
+      
+      canvas.onmousedown = (e) => {
+          isDragging = true;
+          startDragX = e.clientX - cropX;
+          startDragY = e.clientY - cropY;
+          e.preventDefault();
+      };
+      
+      canvas.ontouchstart = (e) => {
+          isDragging = true;
+          const touch = e.touches[0];
+          startDragX = touch.clientX - cropX;
+          startDragY = touch.clientY - cropY;
+          e.preventDefault();
+      };
+      
+      document.onmousemove = (e) => {
+          if (!isDragging) return;
+          cropX = e.clientX - startDragX;
+          cropY = e.clientY - startDragY;
+          updateCropPosition();
+      };
+      
+      document.ontouchmove = (e) => {
+          if (!isDragging) return;
+          const touch = e.touches[0];
+          cropX = touch.clientX - startDragX;
+          cropY = touch.clientY - startDragY;
+          updateCropPosition();
+      };
+      
+      document.onmouseup = () => {
+          isDragging = false;
+      };
+      
+      document.ontouchend = () => {
+          isDragging = false;
+      };
+  }
+
+  function updateCropPosition() {
+      const canvas = document.getElementById('crop-canvas');
+      canvas.style.left = cropX + 'px';
+      canvas.style.top = cropY + 'px';
+  }
+
+  function updateZoom(value) {
+      cropZoom = parseInt(value);
+      const canvas = document.getElementById('crop-canvas');
+      canvas.style.width = cropZoom + '%';
+      canvas.style.height = 'auto';
+  }
+
+  function resetCrop() {
+      cropX = 0;
+      cropY = 0;
+      cropZoom = 100;
+      document.getElementById('zoom-slider').value = 100;
+      const canvas = document.getElementById('crop-canvas');
+      canvas.style.left = '0px';
+      canvas.style.top = '0px';
+      canvas.style.width = '100%';
+      canvas.style.height = 'auto';
   }
 
   function closeImageUploadModal() {
       document.getElementById('image-upload-modal').style.display = 'none';
+      cropMode = false;
+      isDragging = false;
   }
 
   function saveImage() {
@@ -1833,11 +2026,43 @@
           return alert(currentImageSourceType === 'file' ? 'Selecciona un archivo' : 'Pega un link/URL');
       }
       
-      if (currentImageCallback) {
-          currentImageCallback(currentImagePreviewData);
+      if (cropMode) {
+          const wrapper = document.getElementById('crop-canvas-wrapper');
+          const canvas = document.getElementById('crop-canvas');
+          
+          const tempCanvas = document.createElement('canvas');
+          const ctx = tempCanvas.getContext('2d');
+          
+          const wrapperWidth = wrapper.offsetWidth;
+          const wrapperHeight = wrapper.offsetHeight;
+          
+          tempCanvas.width = wrapperWidth;
+          tempCanvas.height = wrapperHeight;
+          
+          const img = new Image();
+          img.onload = () => {
+              const scale = cropZoom / 100;
+              const scaledWidth = img.width * scale;
+              const scaledHeight = img.height * scale;
+              
+              ctx.drawImage(img, cropX, cropY, scaledWidth, scaledHeight);
+              
+              const croppedImage = tempCanvas.toDataURL('image/png');
+              
+              if (currentImageCallback) {
+                  currentImageCallback(croppedImage);
+              }
+              
+              closeImageUploadModal();
+          };
+          img.src = cropOriginalImage;
+      } else {
+          if (currentImageCallback) {
+              currentImageCallback(currentImagePreviewData);
+          }
+          
+          closeImageUploadModal();
       }
-      
-      closeImageUploadModal();
   }
   
   // ESTILOS
